@@ -1,0 +1,6 @@
+{
+  "name": "PropMaster Enterprise",
+  "description": "Professional Real Estate Portfolio Management System. Features dashboard analytics, property tracking, financial management, and maintenance ticketing with persistent local state.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
