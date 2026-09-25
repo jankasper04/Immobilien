@@ -43,6 +43,8 @@ $R --frames --workers=4                                           # Frames, para
 node render.mjs --encode --out=out/video.mp4                      # zu MP4
 ```
 
-1. Hier gibt es keine GPU, deshalb `--soft-gl`. Einfache Frames brauchen etwa 0,2 s, Frames mit vielen Aquarellflächen (`fill`) bis zu 30 s. Ein 60 Sekunden Video hat 1440 Frames. Setz `fill` also sparsam ein (große Flächen wie Himmel), nimm sonst `wash`, und behalte das `ms/frame` in der Ausgabe im Blick.
-2. Auf einem Rechner mit Grafikkarte geht es ohne `--soft-gl` und deutlich schneller.
-3. Die Google Schrift „Permanent Marker“ lädt hier nicht (Zertifikat des Proxys). Das ist egal, solange kein Text im Bild ist.
+1. Hier gibt es keine GPU, deshalb `--soft-gl`. Damit das nicht quälend langsam wird, sind im Kit drei Dinge eingebaut: `--soft-gl` hält die 2D-Hilfsflächen von Chrome in Software, `paint()` und `inkLine()` überspringen Formen, die komplett außerhalb des Bildes liegen, und voll deckende Farbe wird ohne die teure Pigment-Mischung aufgetragen. Ein Frame braucht so etwa 1 Sekunde, ein 60 Sekunden Video (1440 Frames) mit `--workers=3` rund eine halbe Stunde.
+2. Große, flache Hintergrundflächen (Himmel, Wasser) malt `src/scenes/theseus.js` mit einer eigenen `flat()` Funktion statt mit `paint()`. Das sieht gleich aus und spart viel Zeit. Wenn ein Frame trotzdem mehrere Sekunden braucht, liegt es fast immer an großen `paint()`-Flächen oder vielen `fill`-Aquarellflächen.
+3. Auf einem Rechner mit Grafikkarte geht es ohne `--soft-gl` und deutlich schneller.
+4. Die Google Schrift „Permanent Marker“ lädt hier nicht (Zertifikat des Proxys). Das ist egal, solange kein Text im Bild ist.
+5. `src/scenes/theseus.js` ist ein fertiges Beispiel im Hochformat: eine Welt mit einer Uhr, Spiegelung im Wasser, Kamerafahrten und harte Schnitte. Nimm es als Referenz für die Technik, nicht als Vorlage für die Geschichte.

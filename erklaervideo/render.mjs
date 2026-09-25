@@ -57,7 +57,9 @@ if (args.encode) {
 // no WebGL context there. Check which GPU Chrome actually lands on with gpu_probe.mjs.
 const ANGLE = { vulkan: ['--use-angle=vulkan', '--enable-features=Vulkan'], 'gl-egl': ['--use-angle=gl-egl'] };
 if (args['gpu-angle'] && !ANGLE[args['gpu-angle']]) { console.error(`--gpu-angle must be one of ${Object.keys(ANGLE)}`); process.exit(1); }
-const gpu = args['soft-gl'] ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']
+// With --soft-gl, 2D canvases stay in plain software too: p5.brush copies between its 2D mask canvases for every shape,
+// and a SwiftShader-accelerated 2D canvas turns each copy into a slow readback (30 s frames instead of about 1 s).
+const gpu = args['soft-gl'] ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-accelerated-2d-canvas']
   : args['gpu-angle'] ? ANGLE[args['gpu-angle']]
   : process.platform === 'win32' ? ['--use-angle=d3d11'] : process.platform === 'darwin' ? ['--use-angle=metal'] : ['--use-gl=angle'];
 // Ubuntu 23.10+ blocks Chrome's user-namespace sandbox; headless rendering of local files doesn't need it.

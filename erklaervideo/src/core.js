@@ -175,10 +175,23 @@ function ribbon(P, w0, w1 = w0) {
 // One call = one painted shape: optional flat wash, optional watercolor fill, optional hatch, optional ink outline.
 // p5.brush 2.2.3 loses strokes drawn far from the origin under a zoomed camera (from zoom ~2, an outline or a line
 // leaves only a dot at its first vertex), so every shape and line is drawn around its own centre.
+// Shapes that land entirely off the canvas are skipped: p5.brush has no dirty rectangle for them and composites them
+// over the WHOLE frame, which costs a full-frame pigment mix per shape (seconds per frame on software WebGL).
+function offCanvas(x0, y0, x1, y1, m = 90) {
+  const r = p5.instance && p5.instance._renderer, M = r && r.uModelMatrix && r.uModelMatrix.mat4;
+  if (!M) return false;
+  let a = Infinity, b = -Infinity, c = Infinity, d = -Infinity;
+  for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) {
+    const X = M[0] * x + M[4] * y + M[12], Y = M[1] * x + M[5] * y + M[13];
+    a = Math.min(a, X); b = Math.max(b, X); c = Math.min(c, Y); d = Math.max(d, Y);
+  }
+  return b < -W / 2 - m || a > W / 2 + m || d < -H / 2 - m || c > H / 2 + m;
+}
 function centred(pts, draw) {
   if (!pts.length) return;
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
   for (const [x, y] of pts) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (offCanvas(x0, y0, x1, y1)) return;
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   push(); translate(cx, cy); draw(pts.map(([x, y]) => [x - cx, y - cy])); pop();
 }
@@ -271,11 +284,27 @@ function defineBrushes() {
   brush.add('dry', { type: 'default', weight: 14, scatter: 3, sharpness: .3, grain: 6, opacity: 90, spacing: .6, pressure: [1, .6], rotate: 'natural', noise: .4 });
 }
 
+// ---------- speed: skip the pigment mix where the paint fully covers ----------
+// p5.brush mixes every painted pixel into the canvas with a 38-band spectral (Kubelka-Munk) shader. Where the paint
+// covers fully (mask alpha 1, e.g. the inside of every full-strength wash), that mix returns the paint colour itself,
+// so we return it directly. Identical look; on software WebGL (no GPU) it makes frames several times faster.
+{
+  const FAST = 'if(mixIntensity>0.999){outColor=vec4(pigment.rgb,1.0);return;}';
+  const patch = (fn) => function (vert, frag, ...rest) {
+    if (typeof frag === 'string') frag = frag.replace(/(float\s+mixIntensity\s*=\s*min\(maskColor\.a,\s*1\.0\);)/, '$1' + FAST);
+    return fn.call(this, vert, frag, ...rest);
+  };
+  if (p5.prototype.createShader) p5.prototype.createShader = patch(p5.prototype.createShader);
+  if (p5.Graphics && p5.Graphics.prototype.createShader) p5.Graphics.prototype.createShader = patch(p5.Graphics.prototype.createShader);
+}
+
 // ---------- frame ----------
 async function setup() {
   createCanvas(W, H, WEBGL); pixelDensity(1); noLoop();
   brush.scaleBrushes(5); defineBrushes();
-  paperG = makePaper(); grainC = makeGrain(); glowTex = makeGlowTex(); letG = createGraphics(W, H); letG.pixelDensity(1);
+  // paper and glow become static images: a p5.Graphics is re-uploaded to the GPU every time it's drawn, which is slow
+  // on software WebGL; an image is uploaded once
+  paperG = makePaper().get(); grainC = makeGrain(); glowTex = makeGlowTex().get(); letG = createGraphics(W, H); letG.pixelDensity(1);
   outC = document.getElementById('out'); outC.width = W; outC.height = H; outX = outC.getContext('2d');
   await document.fonts.load('100px "Permanent Marker"');
   window.ready = true;
