@@ -1,4 +1,4 @@
-// theseus.js: "Das Schiff des Theseus", 58 s, 9:16. The storyboard is STORYBOARD.md.
+// theseus.js: "Das Schiff des Theseus", 58 s, 9:16. The storyboard is STORYBOARD_theseus.md.
 // One world, one clock: everything below is a pure function of video time t. The shots only choose the camera and the
 // transitions, so a plank that breaks in one shot is still gone in the next.
 (() => {

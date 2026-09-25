@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Clawd studio</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=block">
 <style>
+  @font-face { font-family: 'Permanent Marker'; src: url(assets/PermanentMarker.woff2) format('woff2'); font-display: block; }
   html, body { margin: 0; background: #1b1820; color: #eee; font: 13px system-ui, sans-serif; }
   main { padding: 12px; display: grid; gap: 8px; }
   #out { max-width: min(100%, 1280px); max-height: 85vh; background: #F3EBDC; }
@@ -28,8 +28,8 @@
 <script src="src/timeline.js"></script>
 <!-- reference sheets (standalone loops) -->
 <script src="src/sheets.js"></script>
-<!-- your video: add a script per scene file, in order -->
-<script src="src/scenes/theseus.js"></script>
+<!-- your video: the scene picked in src/config.js (or ?scene=name) -->
+<script>document.write('<script src="src/scenes/' + SCENE_NAME + '.js"><\/script>');</script>
 <script>
   // Open studio.html?loop=emotions (or views) to scrub a standalone loop instead of the video.
   const q = new URLSearchParams(location.search).get('loop'); if (q && LOOPS[q]) window.LOOP = LOOPS[q];
