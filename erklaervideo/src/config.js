@@ -9,6 +9,7 @@ const SCENE = 'falle15';
 const SCENES = {
   theseus: { duration: 58, bpm: 100 },   // Das Schiff des Theseus (STORYBOARD_theseus.md)
   falle15: { duration: 58, bpm: 104 },   // Die 15 Prozent Falle nach dem Kauf (STORYBOARD_falle15.md)
+  sisyphos: { duration: 58, bpm: 96 },   // Sisyphos (STORYBOARD_sisyphos.md)
 };
 const SCENE_NAME = new URLSearchParams(location.search).get('scene') || SCENE;
 const PROJECT = { offset: 0, width: 1080, height: 1920, ...SCENES[SCENE_NAME] };
