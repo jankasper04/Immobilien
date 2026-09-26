@@ -394,7 +394,7 @@
     }
   }
   // Clawd's thought bubble: the awake cat and the ghost, swapping faster and faster, then a swirl, then pop
-  const BUB = [CX + 10, 905], BUBT = [14.55, 16.5];
+  const BUB = [180, 920], BUBT = [14.55, 16.5];
   function bubble(t) {
     const k = backOut(seg(t, BUBT[0], BUBT[0] + .3)), after = t - BUBT[1];
     if (k <= .02) return;
@@ -402,16 +402,16 @@
     if (after > 0) { if (after < .5) for (let i = 0; i < 8; i++) { const ang = i * TAU / 8; boilSeed('bp' + i); sparkle(bx + Math.cos(ang) * 240 * easeOut(after / .5), by + Math.sin(ang) * 180 * easeOut(after / .5), 26, after / .5); } return; }
     const spin = easeIn(seg(t, 16.05, BUBT[1]));
     boilSeed('puffs');
-    paint(ellPts(CX + 40, 1192, 13 * k, 11 * k, 12), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
-    paint(ellPts(CX + 30, 1140, 22 * k, 18 * k, 14), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
+    paint(ellPts(CX + 5, 1200, 12 * k, 10 * k, 12), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
+    paint(ellPts(CX - 12, 1163, 19 * k, 16 * k, 14), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
     push(); translate(bx, by); scale(k * (1 + .06 * Math.sin(t * 30) * spin)); rotate(.25 * spin * Math.sin(t * 22));
     boilSeed('bubble');
-    const C = []; for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, r = 1 + .09 * Math.abs(Math.sin(a * 3.5)); C.push([Math.cos(a) * 225 * r, Math.sin(a) * 170 * r]); }
+    const C = []; for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, r = 1 + .09 * Math.abs(Math.sin(a * 3.5)); C.push([Math.cos(a) * 262 * r, Math.sin(a) * 200 * r]); }
     paint(C, { wash: '#EEE7F6', ink: PAL.ink, sw: 1.1 });
     const which = swapN(t) % 2;
     if (spin < .35) {
-      if (!which) cat(-40, 105, 30, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1 + .6 * Math.sin(t * 11), wag: t * 8, key: 'ba' });
-      else cat(25, 70, 28, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, key: 'bg' });
+      if (!which) cat(-45, 118, 32, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1 + .6 * Math.sin(t * 11), wag: t * 8, key: 'ba' });
+      else cat(20, 82, 30, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, key: 'bg' });
     } else {
       rotate(spin * TAU * 1.5);
       cat(-40, 105, 26, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1.2, op: 200, key: 'ba' });
@@ -523,18 +523,18 @@
   // C 10.6–14.5: the violet "both" view: awake and playful, and a ghost rising out of it
   function shotC(t) {
     let c = mixCam(BACK, [BX + 60, 1390, 2.05], ease(seg(t, 10.6, 12.0)));
-    if (t > 12.9) c = mixCam(c, [CATX + 10, 1250, 1.75], ease(seg(t, 12.9, 14.3)));
+    if (t > 12.9) c = mixCam(c, [CATX - 20, 1255, 2.0], ease(seg(t, 12.9, 14.3)));
     frame(t, c);
   }
   // D 14.5–17.9: Clawd tries to picture both at once; the bubble; dizzy
   function shotD(t) {
     const dz = seg(t, 16.25, 16.6);
-    frame(t, [CX + 50, 1135 + 10 * dz * Math.sin(t * 4), 1.6 + .03 * (t - 14.5), .045 * dz * Math.sin(t * 3.4)]);
+    frame(t, [CX + 5, 1140 + 10 * dz * Math.sin(t * 4), 1.48 + .03 * (t - 14.5), .045 * dz * Math.sin(t * 3.4)]);
   }
   // E 17.9–25.2: the lid; the collapse; the cat jumps on Clawd's head
   function shotE(t) {
     let c;
-    const E1 = [545, 1330, 1.28], EC = [CATX - 20, 1262, 2.15], E2 = [575, 1300, 1.3], E3 = [CX + 100, 1230, 1.5], E4 = [CX + 40, 1195, 1.85];
+    const E1 = [545, 1330, 1.28], EC = [CATX - 20, 1262, 2.15], E2 = [545, 1300, 1.25], E3 = [CX + 100, 1230, 1.5], E4 = [CX + 40, 1195, 1.85];
     if (t < COLLAPSE) c = mixCam(TWO, E1, ease(seg(t, 17.9, 19.8)));
     else if (t < 20.9) c = mixCam(E1, EC, ease(seg(t, COLLAPSE, 20.3)));
     else if (t < 21.8) c = mixCam(EC, E2, ease(seg(t, 20.9, 21.45)));
