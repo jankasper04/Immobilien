@@ -47,8 +47,8 @@ Shots:
              10.2–11.4 zurück zu Clawd: verliebt in die Torte, dann Lachen
              11.45–11.8 G1: Labor-Blitz (kaum zu fassen, soll es auch nicht)
 
-  D  11.9–15.3  [harter Schnitt, halbnah]  Ein riesiges Tortenstück fliegt aus der Menge herein. Clawd klappt die Lunchbox auf und fängt es mit dem Mund. Mampfen im Takt, Krümel fliegen. G2: mitten im Kauen das Labor, Clawd sitzt reglos mit leeren Augen. Zurück im Paradies hört Clawd auf zu kauen: ein Fragezeichen.
-     reads:  11.9–12.7 Stück fliegt im Bogen herein, Mund klappt auf, schnapp
+  D  11.9–15.3  [harter Schnitt, halbnah]  Ein riesiges Schokoladentortenstück fliegt von rechts aus der Menge herein, Clawd schaut ihm mit offenem Mund entgegen, klappt die Lunchbox auf und fängt es mit dem Mund. Mampfen im Takt, Krümel fliegen. G2: mitten im Kauen das Labor, Clawd sitzt reglos mit leeren Augen. Zurück im Paradies hört Clawd auf zu kauen: ein Fragezeichen.
+     reads:  11.95–12.7 Clawd schaut nach rechts, das Stück fliegt im Bogen herein, Mund klappt auf, schnapp
              12.7–14.0 Mampfen, Krümel, Clawd glücklich
              14.05–14.55 G2: Labor, länger (Kabel, Stuhl, Monitor, reglos)
              14.55–15.3 Clawd erstarrt, verwirrt (?)
@@ -58,7 +58,7 @@ Shots:
              16.1–17.1 G3: Labor, Push In aufs leere Gesicht, Kabel, Herzschlag
              17.1–17.6 Paradies flackert, Clawd erschrocken
 
-  F  17.6–19.0  [gleiche Einstellung]  Entschluss: Clawd greift mit beiden Armen an die Krone und zieht. Der Körper streckt sich, die Krone flackert zwischen Krone und Helm. Plopp: der Helm geht ab.
+  F  17.6–19.0  [harter Schnitt, näher]  Entschluss: Clawd greift mit beiden Armen an die Krone und zieht, die Augen zusammengekniffen, Schweißtropfen. Der Körper streckt sich lang, die Krone flackert zwischen Krone und Helm. Plopp: der Helm fliegt vom Kopf.
      reads:  17.6–18.1 entschlossen, Arme hoch
              18.1–18.85 ziehen, strecken, Krone/Helm flackern
              18.85–19.0 plopp
@@ -68,13 +68,13 @@ Shots:
              20.2–22.0 Pull Back: allein, die leere Straße
              22.0–22.6 ein roter Schirm schiebt sich rechts ins Bild
 
-  H  22.6–27.4  [Schnitt, halbnah, Zweiereinstellung]  Der Freund trabt mit rotem Schirm herein, bleibt neben Clawd stehen und hält den Schirm über beide. Auf Clawd regnet es nicht mehr. Clawd schaut hoch, dann zum Freund, ist erleichtert und lächelt. Ein warmes Licht unter dem Schirm. Der Helm hängt draußen im Regen.
+  H  22.6–27.4  [Schnitt, halbnah, Zweiereinstellung]  Der Freund trabt mit rotem Schirm herein, bleibt Schulter an Schulter neben Clawd stehen und hält den Schirm über beide. Auf Clawd regnet es nicht mehr. Clawd schaut hoch, dann zum Freund, ist erleichtert und lächelt. Ein warmes Licht unter dem Schirm. Der Helm hängt draußen im Regen.
      reads:  22.6–23.9 roter Schirm, der Freund trabt herein
              23.9–24.8 der Freund dreht sich zu Clawd, der Schirm wandert über Clawd, der Regen hört auf
              24.8–25.7 Clawd schaut hoch, dann zum Freund
              25.7–27.4 erleichtert, lächelt, warmes Licht, der Freund lehnt sich an
 
-  I  27.4–33.4  [Kamera: Zweiereinstellung, dann Push In bis auf die Augen]  Der Helm summt und lockt: das Leuchten schwillt, goldene Funken wie Konfetti. Clawd hebt ihn hoch, links der Helm, rechts der Freund. Clawd schaut zum Helm, zum Freund, zum Helm, zum Freund. Die Kamera fährt bis auf die Augen: links kaltes Cyan, rechts warmes Rot. Die Augen wandern, werden langsamer, bleiben stehen, schließen sich, öffnen sich entschlossen.
+  I  27.4–33.4  [Kamera: Zweiereinstellung, dann Push In bis auf die Augen]  Der Helm summt und lockt: das Leuchten schwillt, goldene Funken wie Konfetti. Clawd hebt ihn hoch, links der Helm, rechts der Freund. Clawd schaut zum Helm, zum Freund, zum Helm, zum Freund und lehnt sich jeweils ein wenig zur Seite, in die er schaut. In der Nahaufnahme spiegelt sich in den Augen Cyan (Helm) oder warmes Licht (Freund). Die Kamera fährt bis auf die Augen: links kaltes Cyan, rechts warmes Rot. Die Augen wandern, werden langsamer, bleiben stehen, schließen sich, öffnen sich entschlossen.
      reads:  27.4–28.4 der Helm lockt, Clawd hebt ihn hoch
              28.4–30.6 Blicke: Helm, Freund, Helm, Freund (jeder Blick eine eigene Pause)
              30.6–31.6 Push In auf die Augen
@@ -104,7 +104,7 @@ Checks: Jeder Shot hat ein Ereignis und eine Kamerabewegung. Kein Text. Der Schl
 | 7.4 | Die Menge jubelt und klatscht |
 | 9.0 | Eine riesige Torte wächst hinter Clawd |
 | 11.45 | Erster Glitch (kaum sichtbar): Labor |
-| 11.9 | Ein Tortenstück fliegt herein, Clawd schnappt es |
+| 11.95 | Ein Tortenstück fliegt herein, Clawd schnappt es (12.7) |
 | 12.7 | Mampfen, Krümel |
 | 14.05 | Zweiter Glitch: Clawd sitzt reglos im Labor, voller Kabel |
 | 14.6 | Clawd hört auf zu kauen, verwirrt |

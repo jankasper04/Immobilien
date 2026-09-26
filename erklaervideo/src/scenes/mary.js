@@ -14,6 +14,10 @@
   const toRoom = ([x, y]) => [PX0 + x * S, PY0 + y * S];
   const GGY = 1500;                                  // the garden's horizon
   const APPLE_G = [660, 770], APR = 40, APPLE_RM = toRoom(APPLE_G);
+  // the apple sways on its twig: where its centre really is (cameras centre on this, so the match cut lines up)
+  const appleSway = t => .05 * Math.sin(t * 1.2);
+  const appleAtG = t => { const a = appleSway(t); return [APPLE_G[0] + 3 - Math.sin(a) * 46, APPLE_G[1] - 46 + Math.cos(a) * 46]; };
+  const appleAtR = t => toRoom(appleAtG(t));
   const BOOK = { x0: 160, x1: 500, y0: 1470, y1: 1650, sp: 330 };
   const PL = { x0: 169, x1: 326, y0: 1479, y1: 1641 }, PR = { x0: 334, x1: 491, y0: 1479, y1: 1641 };
   const DRAWN = [247, 1556], DRR = 36;               // the apple drawn in the book
@@ -268,7 +272,7 @@
     const seep = kd <= 0 ? seg(st, SEEP, SEEP + .45) : 0;
     if (seep > 0) {
       const lc = C('#FFF8E6', s), fl = .75 + .25 * Math.sin(t * 9);
-      glow(DOOR.x1, 1180, 200, lc, .8 * seep * fl); glow(DOOR.x1, 1440, 200, lc, .8 * seep * fl); glow(DOOR.cx, FY, 240, lc, .75 * seep * fl); glow(DOOR.x0 + 40, DOOR.y0, 160, lc, .5 * seep * fl);
+      glow(DOOR.x1, 1180, 200, lc, .8 * seep * fl); glow(DOOR.x1, 1440, 200, lc, .8 * seep * fl); glow(DOOR.cx, FY, 240, lc, .75 * seep * fl);
       boilSeed('seep');
       inkLine([[DOOR.x1 - 3, DOOR.y0 + 6], [DOOR.x1 - 3, (DOOR.y0 + FY) / 2], [DOOR.x1 - 3, FY - 4]], 3.4 * seep, lc, 'dry', .2);
       inkLine([[DOOR.x0 + 8, FY - 4], [DOOR.cx, FY - 3], [DOOR.x1 - 6, FY - 4]], 3.6 * seep, lc, 'dry', .2);
@@ -545,8 +549,8 @@
     return o;
   }
   const MOOD = [
-    [-99, 'thinking'], [5.7, 'happy'], [6.5, 'determined'], [8.25, 'surprised', { emote: null }], [9.0, 'thinking', { emote: null }],
-    [10.5, 'proud'], [13.3, 'surprised', { emote: null }], [13.75, 'confused'], [14.35, 'hopeful'], [16.75, 'surprised', { emote: null, mouth: 'o' }],
+    [-99, 'thinking'], [5.7, 'happy'], [6.5, 'determined'], [8.25, 'surprised', { emote: null, mouth: 'o' }], [9.0, 'thinking', { emote: null }],
+    [10.5, 'proud'], [13.3, 'surprised', { emote: null, mouth: 'o' }], [13.75, 'confused'], [14.35, 'hopeful'], [16.75, 'surprised', { emote: null, mouth: 'o' }],
     [18.4, 'neutral'], [24.3, 'surprised', { emote: null }], [26.28, 'starstruck'],
   ];
   function clawdRoom(st) {
@@ -710,7 +714,7 @@
     }
     // the apple: always red, even in the grey world
     if (inView(APPLE_G[0] - 80, APPLE_G[1] - 120, APPLE_G[0] + 80, APPLE_G[1] + 60)) {
-      const sl = satAt(APPLE_G[0], APPLE_G[1] - 60, 60), sway = .05 * Math.sin(t * 1.2);
+      const sl = satAt(APPLE_G[0], APPLE_G[1] - 60, 60), sway = appleSway(t);
       const pk = o.pulse || 0;
       if (o.redGlow > 0) glow(APPLE_G[0], APPLE_G[1], APR * 5, '#FF3B3B', o.redGlow);
       boilSeed('twig');
@@ -740,9 +744,10 @@
   const A_Z = 21;                                         // room zoom that makes the far apple fill the frame
   const DOORCAM = [DOOR.cx, 1340, 2.9], WIDE_F = [640, 1265, .95], CLAWD_F = [735, 1480, 1.55];
   function camF(t) {
-    if (t < BURST) return camAt(APPLE_RM, [0, 0], A_Z * (1 - .025 * seg(t, REV[1], BURST)));
-    const c0 = camAt(APPLE_RM, [0, 0], A_Z * .975);
-    if (t < ROOM_W) return camPath(APPLE_RM, c0, DOORCAM, easeOut(seg(t, BURST, ROOM_W)));
+    const P = appleAtR(Math.min(t, BURST));
+    if (t < BURST) return camAt(P, [0, 0], A_Z * (1 - .025 * seg(t, REV[1], BURST)));
+    const c0 = camAt(P, [0, 0], A_Z * .975);
+    if (t < ROOM_W) return camPath(P, c0, DOORCAM, easeOut(seg(t, BURST, ROOM_W)));
     if (t < 25.9) return camPath(APPLE_RM, DOORCAM, WIDE_F, ease(seg(t, ROOM_W, 25.9)));
     return mixCam(WIDE_F, CLAWD_F, ease(seg(t, 25.9, 26.6)));
   }
@@ -798,7 +803,7 @@
     const ca = st - 24.35;
     if (ca > 0 && ca < .7) for (let i = 0; i < 9; i++) { const a = i / 9 * TAU + .3; sparkle(q.x + Math.cos(a) * (140 + 60 * easeOut(ca / .7)), q.y - 4 * U + Math.sin(a) * (110 + 50 * easeOut(ca / .7)), 22, ca / .7, RAINBOW[i % 7]); }
     const ga = st - 16.85;   // the apple's first glint: lead the eye to the one red thing
-    if (ga > 0 && ga < .55) sparkle(APPLE_RM[0] - 4, APPLE_RM[1] - 6, 16, ga / .55, '#FFFDF6');
+    if (ga > 0 && ga < .55) { const [ax, ay] = appleAtR(st); sparkle(ax - 4, ay - 6, 16, ga / .55, '#FFFDF6'); }
     const pa = st - 10.55;   // proud: a sparkle over the head
     if (pa > 0 && pa < .6) sparkle(q.x + 40, q.y - 9.5 * U, 26, pa / .6, greyOf('#FFF5E2'));
     waveFront('rw');
@@ -898,22 +903,22 @@
     const ots = [768, 1410, 1.5];
     if (t < 17.9) return [ots[0], ots[1] - 4 * (t - 16), ots[2] * (1 + .03 * (t - 16))];
     const c0 = [ots[0], ots[1] - 7.6, ots[2] * 1.057];
-    if (t < 19.7) return camPath(APPLE_RM, c0, camAt(APPLE_RM, [0, 0], A_Z), ease(seg(t, 17.9, 19.7)));
-    return camAt(APPLE_RM, [0, 0], A_Z * (1 + .025 * (t - 19.7)));
+    const P = appleAtR(t);
+    if (t < 19.7) return camPath(P, c0, camAt(P, [0, 0], A_Z), ease(seg(t, 17.9, 19.7)));
+    return camAt(P, [0, 0], A_Z * (1 + .025 * (t - 19.7)));
   }
   function shotE(t) { roomFrame(t, t, camE(t)); }
   function shotRev(t) { reverseFrame(t); }
   // F 21.8–27.4: the apple pulses; the colour runs out from it, through the garden, the door, Clawd, the room
   function shotF(t) { roomFrame(t, t, camF(t)); }
   // G 27.4–32.0 and H 32.0–36.0: the garden in colour; crane up to the apple; match cut to the drawn one; iris
-  const GCAM = [260, 1290, 1.02];
   function camG(t) {
-    if (t < 28.6) return [lerp(GCAM[0], 470, ease(seg(t, 27.4, 28.6))), GCAM[1], GCAM[2]];
-    const c = [470, lerp(1290, 1250, seg(t, 28.6, 31)), lerp(1.02, 1.12, seg(t, 28.6, 31))];
+    if (t < 28.6) return [lerp(300, 480, ease(seg(t, 27.4, 28.6))), 1335, 1.25];
+    const c = [480, lerp(1335, 1300, seg(t, 28.6, 31)), lerp(1.25, 1.34, seg(t, 28.6, 31))];
     if (t < 31.0) return c;
-    const cEnd = camAt(APPLE_G, [0, 0], 6.3);
-    if (t < 33.4) return camPath(APPLE_G, [470, 1250, 1.12], cEnd, ease(seg(t, 31.0, 33.4)));
-    return camAt(APPLE_G, [0, 0], 6.3 * (1 + .025 * (t - 33.4)));
+    const P = appleAtG(t), cEnd = camAt(P, [0, 0], 6.3);
+    if (t < 33.4) return camPath(P, [480, 1300, 1.34], cEnd, ease(seg(t, 31.0, 33.4)));
+    return camAt(P, [0, 0], 6.3 * (1 + .025 * (t - 33.4)));
   }
   function shotG(t) {
     if (t < LOOP) return gardenFrame(t, t, camG(t));

@@ -200,8 +200,8 @@
   let S0 = 19.375;
   PLAN.forEach(([vb, cb], j) => {
     const V = vb * BEAT, C = cb * BEAT, S = S0, T = S + V, prev = EX[EX.length - 1];
-    if (j > 0) Object.assign(prev, { ca: S + .03 * V, rd: S + .1 * V, rx: S + .18 * V, ts: S + .52 * V });
-    const e = { q: QS[j], a: AS[j], S, V, C, bv: S + .58 * V, w0: S + .64 * V, w1: S + .86 * V, fl: S + .92 * V, in1: T + .1 * C, arrive: ARRIVE,
+    if (j > 0) Object.assign(prev, { ca: S + .03 * V, rd: S + .1 * V, rx: S + .17 * V, ts: S + .44 * V });
+    const e = { q: QS[j], a: AS[j], S, V, C, bv: S + .56 * V, w0: S + .63 * V, w1: S + .86 * V, fl: S + .92 * V, in1: T + .1 * C, arrive: ARRIVE,
       gr: T + .14 * C, wk0: T + .17 * C, wk1: T + .28 * C, f0: T + .3 * C, f1: T + .5 * C, nf: C > 2 ? 3 : C > 1.1 ? 2 : 1, fd: T + .52 * C,
       bk0: T + .58 * C, bk1: T + .68 * C, put: T + .7 * C, bl: T + .72 * C, p0: T + .76 * C, p1: T + .9 * C, pu: T + .93 * C, out1: T + C };
     e.inX = tt => lerp(LEDGE_X, ARRIVE, easeOut(seg(tt, e.fl, e.in1)));
@@ -210,7 +210,7 @@
   });
   Object.assign(EX[EX.length - 1], { ca: 35.15, rd: 35.4, rx: 35.75, ts: 36.45 });
   // the last question: the same glyph as the opening card, so the loop closes
-  EX.push({ q: 0, a: 9, final: true, bv: 36.6, w0: 36.9, w1: 37.7, fl: 38.1, in1: 39.1, arrive: 430, inX: tt => lerp(LEDGE_X, 430, ease(seg(tt, 38.12, 39.1))),
+  EX.push({ q: 0, a: 9, final: true, bv: 36.6, w0: 36.9, w1: 37.7, fl: 38.1, in1: 39.5, arrive: 400, inX: tt => lerp(LEDGE_X, 400, ease(seg(tt, 38.12, 39.5))),
     gr: 99, wk0: 99, wk1: 99, f0: 99, f1: 99.5, nf: 0, fd: 99, bk0: 99, bk1: 99, put: 99, bl: 99, p0: 99, p1: 99, pu: 99, out1: 99.5, outX: () => PAINT_X, ca: 99, rd: 99, rx: 99, ts: 99 });
 
   // page flips, the spread each exchange ends on, and the chat log for the screen
@@ -310,8 +310,9 @@
   const VEV = [];                                            // the visitor's timeline of actions
   EX.forEach((e, i) => {
     const pts = i ? EX[i - 1].ts : -9;
-    if (e.ca < 90) VEV.push([e.ca - .3, 'reach', e], [e.ca, 'lift', e], [e.rd, 'read', e], [e.rx, 'react', e], [e.ts - Math.min(.3, (e.ts - e.rx) * .45), 'toss', e], [e.ts + .08, 'free', e]);
-    VEV.push([e.bv - Math.min(.2, (e.bv - pts - .08) * .6), 'turn', e], [e.bv, 'blank', e], [e.w0, 'write', e], [e.w1, 'wind', e], [e.fl, 'flick', e], [e.fl + .3, 'wait', e]);
+    if (e.ca < 90) VEV.push([e.ca - .3, 'reach', e], [e.ca, 'lift', e], [e.rd, 'read', e], [e.rx, 'react', e], [e.ts - Math.min(.3, (e.ts - e.rx) * .45), 'toss', e]);
+    if (i) VEV.push([pts + Math.min(.08, (e.bv - pts) * .3), 'free', e]);
+    VEV.push([e.bv - Math.min(.2, (e.bv - pts) * .4), 'turn', e], [e.bv, 'blank', e], [e.w0, 'write', e], [e.w1, 'wind', e], [e.fl, 'flick', e], [e.fl + .3, 'wait', e]);
   });
   VEV.sort((a, b) => a[0] - b[0]);
   function visitorAt(t) {
@@ -670,11 +671,11 @@
       clawd(Cp.x, GY, U, { ...Cp.o, boilKey: 'C' });
       for (const c of cards) if (c.held === 'C') card(c.x, c.y, c.rot, c.g, c.kind, c.gk, c.key);
       const e = exC(t);
-      if (t > e.p0 - .03 && t < e.p1 + .05) { const [hx, hy] = armTip(Cp.x, GY, U, Cp.o, 'L'), k = paintK(e, t), [gx, gy] = glyphHead(e.a, k); brushTool(hx, hy, PAINT_X + gx * 24, REST_Y + gy * 24, COL.gA, 'brushC'); }
+      if (t >= e.p0 && t < e.p1 + .04) { const [hx, hy] = armTip(Cp.x, GY, U, Cp.o, 'L'), k = paintK(e, t), [gx, gy] = glyphHead(e.a, k); brushTool(hx, hy, PAINT_X + gx * 24, REST_Y + gy * 24, COL.gA, 'brushC'); }
     }
     clawd(Vp.x, GY, VU, { ...Vp.o, boilKey: 'V' });
     for (const c of cards) if (c.held === 'V') card(c.x, c.y, c.rot, c.g, c.kind, c.gk, c.key);
-    for (const e of EX) if (t > e.w0 - .03 && t < e.w1 + .05) { const [hx, hy] = armTip(Vp.x, GY, VU, Vp.o, 'L'), [gx, gy] = glyphHead(e.q, seg(t, e.w0, e.w1)); brushTool(hx, hy, LEDGE_X + gx * 24, REST_Y + gy * 24, COL.gQ, 'brushV'); }
+    for (const e of EX) if (t >= e.w0 && t < e.w1 + .04) { const [hx, hy] = armTip(Vp.x, GY, VU, Vp.o, 'L'), [gx, gy] = glyphHead(e.q, seg(t, e.w0, e.w1)); brushTool(hx, hy, LEDGE_X + gx * 24, REST_Y + gy * 24, COL.gQ, 'brushV'); }
     thought(t);
     panel(t);
     monitor(t);
@@ -773,9 +774,9 @@
     const scr0 = [SCREEN[0], SCREEN[1] + 8.3, SCREEN[2] * 1.028];
     if (t < 35.15) { const k = ease(seg(t, 34.375, 35.15)); c = [lerp(scr0[0], VIS1[0], k), lerp(scr0[1], VIS1[1], k), scr0[2] * Math.pow(VIS1[2] / scr0[2], k) * (1 - .45 * Math.sin(Math.PI * k))]; wk = [seg(t, 34.375, 35.15), 0]; }
     else if (t < 38.1) c = mixCam(VIS1, [262, GY - 135, 2.45], ease(seg(t, 35.15, 37.9)));
-    else { const k = ease(seg(t, 38.1, 39.5)); c = [lerp(262, WL0 - 4, k), lerp(GY - 135, SY, k), 2.45 * Math.pow(6 / 2.45, k)]; }
+    else { const k = ease(seg(t, 38.1, 39.6)); c = [lerp(262, WL0 - 16, k), lerp(GY - 135, SY, k), 2.45 * Math.pow(5.2 / 2.45, k)]; }
     frame(t, c, { whip: wk });
-    if (t > 38.75) { const [sx, sy] = scr([WL0 - 4, SY], c); slotIris(sx, sy, kf(t, [[38.75, 1500], [39.75, 0]], easeIn)); }
+    if (t > 38.95) { const [sx, sy] = scr([WL0 - 4, SY], c); slotIris(sx, sy, kf(t, [[38.95, 1500], [39.8, 0]], easeIn)); }
   }
 
   shots([[0, shotA], [3.44, shotB], [8.44, shotC], [11.25, shotD], [15.625, shotE], [19.375, shotF], [28.125, shotG], [34.375, shotH]]);

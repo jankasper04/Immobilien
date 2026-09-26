@@ -4,10 +4,9 @@
 // Everything is a pure function of t; the shots only choose the camera and the transitions. The last image (the
 // helmet glowing in the dark) is the first image, so the video loops.
 (() => {
-  const SKIP = k => window.ERF_SKIP && window.ERF_SKIP[k];   // DEBUG
   // ---------- world ----------
   const U = 24, CX = 540, SY = 1560;              // Clawd's size unit, x and ground (feet)
-  const GY = 1470, CURB = 1668, FX = 820;         // foot of the house fronts, the kerb, where the friend stops
+  const GY = 1470, CURB = 1668, FX = 790;         // foot of the house fronts, the kerb, where the friend stops
   const RIM = 7.7;                                // the helmet's rim on the head, in u above the feet
   const HOVER = SY - 14.4 * U, Y0 = -300;         // the helmet's rim hanging over Clawd, and at t = 0
   const GLOW = '#7FE3FF', WARM = '#FFB46E', RED = '#D8394E', DARK = '#16131B';
@@ -172,7 +171,6 @@
   }
   // brush layer: window outlines, paving, lamp
   function streetInk(P, t, para) {
-    if (SKIP('ink')) return;
     for (const w of WINS) {
       if (!inView(w.x - 70, w.y, w.x + 70, w.y + 170)) continue;
       paint(winPts(w), { ink: PAL.ink, sw: .8 });
@@ -228,7 +226,6 @@
 
   // ---------- paradise pieces ----------
   function sun(t) {
-    if (SKIP('sun')) return;
     const sx = 880, sy = 400; if (!inView(sx - 300, sy - 300, sx + 300, sy + 300)) return;
     glow(sx, sy, 330, '#FFE8A6', .85);
     boilSeed('sun');
@@ -237,7 +234,6 @@
   }
   const BUNT = [[-300, 880, 1400, 930, 120], [-300, 1110, 1400, 1070, 80]];
   function bunting(t) {
-    if (SKIP('bunt')) return;
     flushBrush();   // the flags are flat and must sit over the window outlines
     BUNT.forEach(([x0, y0, x1, y1, sag], s) => {
       if (!inView(x0, Math.min(y0, y1), x1, Math.max(y0, y1) + sag + 70)) return;
@@ -256,7 +252,6 @@
   // the red carpet from Clawd's feet down the road
   function carpet() { if (VIEW.y1 > GY + 40) flat([[CX - 90, GY + 50], [CX + 90, GY + 50], [CX + 190, VIEW.y1 + 150], [CX - 190, VIEW.y1 + 150]], '#C8324A'); }
   function goldPools(t) {
-    if (SKIP('pools')) return;
     PUDS.forEach(([px, py, rx, ry], i) => {
       if (!inView(px - rx, py - ry, px + rx, py + ry)) return;
       for (let k = 0; k < 1; k++) { const ph = frac(t * .8 + hash(i * 5 + k)); boilSeed('pool' + i + k); sparkle(px + (hash(i * 7 + k) - .5) * rx, py + (hash(i + k * 3) - .5) * ry, 16, ph); }
@@ -264,7 +259,6 @@
   }
   // confetti: world-anchored cells like the rain, but slow and fluttering; plus the burst at the snap
   function confetti(t) {
-    if (SKIP('conf')) return;
     const cs = 175, i0 = Math.floor((VIEW.x0 - 40) / cs), i1 = Math.floor((VIEW.x1 + 40) / cs), j0 = Math.floor((VIEW.y0 - 40) / cs), j1 = Math.floor((VIEW.y1 + 40) / cs);
     const dens = clamp(VIEW.z * .75, .3, .85), fall = seg(t, T_SNAP, T_SNAP + 1.2);
     let n = 0;
@@ -316,7 +310,6 @@
   const CROWD_FRONT = [[150, SY + 370, 30, '#F0BE46', false, .35, false, true], [945, SY + 395, 32, '#6FC0B8', true, .7, false, true]];
   // cheering: arms up, alternating, hopping on the beat; clockwork = all in step (after the second glitch)
   function crowd(t, list, key, clockwork) {
-    if (SKIP(key)) return;
     list.forEach(([x, y, u, col, flip, ph, hearts, back], i) => {
       if (!inView(x - 8 * u, y - 13 * u, x + 8 * u, y + u)) return;
       const b = bpOf(t) + (clockwork ? 0 : ph), s = Math.sin(b * TAU);
@@ -329,7 +322,6 @@
   const CAKE_BASE = GY + 30, TIERS = [[640, 250, '#F4BCCB', '#FFF5E2'], [470, 215, '#FBE2E9', '#F4BCCB'], [310, 185, '#F4BCCB', '#FFF5E2']];
   const CAKE_TOP = CAKE_BASE - TIERS.reduce((s, x) => s + x[1], 0);
   function cake(t) {
-    if (SKIP('cake')) return;
     const g = t < CAKE_T[0] ? 0 : backOut(seg(t, ...CAKE_T)); if (g < .02) return;
     const w = .05 * spring(t, CAKE_T[1], 5, 14);
     push(); translate(CX, CAKE_BASE); scale(1 + w, g); translate(-CX, -CAKE_BASE);
@@ -364,9 +356,9 @@
   function slice(x, y, a, s = 1) {
     boilSeed('slice');
     push(); translate(x, y); rotate(a); scale(s);
-    paint([[-70, 26], [66, -34], [66, 30], [-70, 30]], { wash: '#F4BCCB', ink: PAL.ink, sw: 1 });
+    paint([[-70, 26], [66, -34], [66, 30], [-70, 30]], { wash: '#7A4A38', ink: PAL.ink, sw: 1 });
     paint([[-70, 24], [66, -36], [70, -24], [-64, 30]], { wash: '#FFF5E2', ink: PAL.ink, sw: .7 });
-    inkLine([[-40, 22], [62, 0]], 1.6, '#E27A92', 'ink', 0);
+    inkLine([[-40, 22], [62, 0]], 2.2, '#FFF5E2', 'ink', 0);
     paint(ellPts(50, -44, 13, 13, 10), { wash: RED, ink: PAL.ink, sw: .6 });
     pop();
   }
@@ -426,7 +418,7 @@
     [11.95, 'neutral', { eyes: 'wide', mouth: 'O', lookX: .9, lookY: -.3, emote: null }], [12.75, 'happy', { emote: null, eyes: 'squeeze' }], [14.65, 'confused'], [15.35, 'nervous'],
     [17.15, 'scared'], [17.65, 'determined'], [18.1, 'determined', { eyes: 'squeeze', emote: 'sweat' }], [19.05, 'surprised', { emote: 'sweat' }], [19.6, 'sad', { emote: null }],
     [24.65, 'surprised', { lookY: -1, emote: null }], [25.7, 'relieved', { emote: null, lookX: .8 }], [26.4, 'happy', { lookX: .7 }],
-    [27.6, 'hopeful', { lookX: -1 }], [29.0, 'neutral', { eyes: 'look', seed: 1.96 }], [32.95, 'determined', { emote: null }],
+    [27.6, 'hopeful', { lookX: -1 }], [29.0, 'neutral', { eyes: 'look', seed: 1.085 }], [32.95, 'determined', { emote: null }],
   ];
   const LOOKS = [[27.6, -1], [28.9, -1], [29.05, 1], [29.75, 1], [29.9, -1], [30.35, -1], [30.5, 1], [30.9, 1], [31.05, -1], [31.7, -1], [31.9, 1], [32.35, 1], [32.5, 0]];
   const HAND_T = [27.7, 28.3];   // the helmet lifted
@@ -463,7 +455,7 @@
       if (t > HAND_T[0]) p.aL = kf(t, [[HAND_T[0], -.3 + .06 * Math.sin(HAND_T[0] * 1.3)], [HAND_T[1], 1.12], [HAND_T[1] + .2, 1.0]], easeOut) + .03 * Math.sin(t * 2);
       if (t > 25.2 && t < 25.7) p.lookX = kf(t, [[25.2, 0], [25.35, 1]]);
       if (t > 26.0 && t < 27.6) p.rot = .06 * ease(seg(t, 26.0, 26.5)) * (1 - ease(seg(t, 27.3, 27.6)));
-      if (t > LOOKS[0][0]) { p.lookX = kf(t, LOOKS, easeOut); p.lookY = 0; }
+      if (t > LOOKS[0][0]) { p.lookX = kf(t, LOOKS, easeOut); p.lookY = 0; p.rot = .07 * kf(t, LOOKS.map(([a, v]) => [a + .06, v])) * (1 - seg(t, 32.4, 32.9)); }
       if (t > 32.45 && t < 32.95) p.squint = kf(t, [[32.45, 0], [32.62, 1]]);
     }
     const o = merge(m, p);
@@ -512,14 +504,14 @@
   function umbAt(t, f) {
     if (!f) return null;
     const hand = armTip(f.x, f.y, U, f.o, 'L');
-    const ax = t < UMB_MOVE[0] ? f.x - 20 : lerp(FX - 20, 682, backOut(seg(t, ...UMB_MOVE))), ay = SY - 395;
+    const ax = t < UMB_MOVE[0] ? f.x - 20 : lerp(FX - 20, 665, backOut(seg(t, ...UMB_MOVE))), ay = SY - 395;
     return { hand, ax, ay, a: .12 * Math.sin(t * 1.1) * .2 + (t < FWALK[1] ? -.05 : 0) };
   }
   function umbrella(u, t) {
     const { hand, ax, ay, a } = u;
     boilSeed('pole');
     inkLine([hand, [ax, ay]], 3.4, '#3B3448', 'ink', 0);
-    inkLine([[hand[0], hand[1] - 4], [hand[0], hand[1] + 22], [hand[0] - 14, hand[1] + 30], [hand[0] - 22, hand[1] + 20]], 3.4, '#3B3448', 'ink', .6);
+    inkLine([[hand[0], hand[1] - 4], [hand[0], hand[1] + 22], [hand[0] + 14, hand[1] + 30], [hand[0] + 22, hand[1] + 20]], 3.4, '#3B3448', 'ink', .6);
     const P = [];
     for (let i = 0; i <= 20; i++) { const g = Math.PI + i / 20 * Math.PI; P.push([Math.cos(g) * UR, UH + Math.sin(g) * UH]); }
     const ribs = 6;
@@ -570,9 +562,9 @@
     if (!hp.onHead) helmetAt(hp.x, hp.y, hp.a, t, { leds: ledsAt(t) });
     else if (VIEW.y0 < hp.y - 5 * U) { const top = [hp.x, hp.y - 5.1 * U]; boilSeed('cable'); inkLine([top, [top[0] + 4, top[1] - 200], [top[0] + 10, VIEW.y0 - 80]], 2.4, '#2A2D38', 'ink', .5); }
     if (t > 27.4 && t < T_BLACK) for (let i = 0; i < 7; i++) {   // the lure: little gold glints of the paradise circling it
-      const a = t * 1.3 + i * TAU / 7, r = (110 + 30 * Math.sin(t * 2 + i)) * seg(t, 27.4, 28.0), k2 = frac(t * .9 + hash(i));
+      const a = t * 1.3 + i * TAU / 7, r = (150 + 30 * Math.sin(t * 2 + i)) * seg(t, 27.4, 28.0), k2 = frac(t * .9 + hash(i));
       boilSeed('lure' + i);
-      sparkle(hp.x + Math.cos(a) * r, hp.y - 2 * U + Math.sin(a) * r * .7, 15, k2, i % 2 ? '#FFE08A' : '#F6B8C8');
+      sparkle(hp.x + Math.cos(a) * r, hp.y - 2 * U + Math.sin(a) * r * .7, 28, k2, i % 2 ? '#FFE08A' : '#F6B8C8');
     }
   }
   function paradise(t) {
@@ -682,19 +674,25 @@
   }
   // H 22.6–27.4: the friend and the umbrella
   function shotH(t) {
-    frame(t, [lerp(705, 680, seg(t, 22.6, 27.4)), lerp(SY - 230, SY - 215, seg(t, 22.6, 27.4)), lerp(1.2, 1.36, ease(seg(t, 22.6, 27.4)))]);
+    frame(t, [lerp(690, 665, seg(t, 22.6, 27.4)), lerp(SY - 230, SY - 215, seg(t, 22.6, 27.4)), lerp(1.2, 1.36, ease(seg(t, 22.6, 27.4)))]);
   }
   // I 27.4–33.4: helmet or friend; push in on the eyes
   const EYES = [CX, SY - 6.1 * U];
   function shotI(t) {
     let c;
-    const two = [lerp(560, 548, seg(t, 28.4, 30.6)), SY - 228, lerp(1.2, 1.28, seg(t, 28.4, 30.6))];
-    if (t < 28.4) c = mixCam([680, SY - 215, 1.36], [560, SY - 228, 1.2], ease(seg(t, 27.4, 28.4)));
+    const two = [lerp(522, 516, seg(t, 28.4, 30.6)), SY - 222, lerp(1.29, 1.36, seg(t, 28.4, 30.6))];
+    if (t < 28.4) c = mixCam([665, SY - 215, 1.36], [522, SY - 222, 1.29], ease(seg(t, 27.4, 28.4)));
     else if (t < 30.6) c = two;
-    else if (t < 31.6) c = mixCam([548, SY - 228, 1.28], [...EYES, 5.2], ease(seg(t, 30.6, 31.6)));
+    else if (t < 31.6) c = mixCam([516, SY - 222, 1.36], [...EYES, 5.2], ease(seg(t, 30.6, 31.6)));
     else c = [EYES[0], EYES[1], lerp(5.2, 6.4, ease(seg(t, 31.6, 33.4)))];
-    frame(t, c, { after: (cl, hp) => { if (t > 30.4) { const k = seg(t, 30.4, 31.2); glow(hp.x + 60, hp.y - 2 * U, 13 * U, GLOW, .55 * k); glow(CX + 10 * U, SY - 6 * U, 10 * U, WARM, .45 * k); } } });
+    frame(t, c, { eyeHook: t > 30.8 ? eyeGlints(t) : undefined, after: (cl, hp) => { if (t > 30.4) { const k = seg(t, 30.4, 31.2); glow(hp.x + 5 * U, hp.y - 2 * U, 14 * U, GLOW, .9 * k); glow(CX + 9 * U, SY - 6 * U, 11 * U, WARM, .75 * k); } } });
   }
+  // coloured reflections in the eyes: cyan when Clawd looks at the helmet, warm when it looks at the friend
+  const eyeGlints = t => (u, sw) => {
+    const lx = kf(t, LOOKS, easeOut), sq = t > 32.45 && t < 33.05; if (sq || Math.abs(lx) < .3) return;
+    const col = lx < 0 ? '#A6F4FF' : '#FFC98E', k = clamp((Math.abs(lx) - .3) / .5);
+    for (const s of [-1, 1]) paint(ellPts(s * 2.5 * u + lx * u * .5 + .18 * u, .55 * u - 6 * u, .2 * u * k, .26 * u * k, 10), { wash: col, ink: null });
+  };
   // J 33.4–36: black; the helmet glows in the dark (= the first frame)
   function shotJ(t) {
     flat(SCREEN, DARK);
