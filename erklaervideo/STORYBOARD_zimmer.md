@@ -44,23 +44,25 @@ Shots:
              16.60–17.80 Fragezeichen, Schulterzucken: keine Ahnung, was da steht
              17.80–19.38 Pull Back zur Zweier-Einstellung: Genie in der Vorstellung, ratloser Clawd in Wirklichkeit
 
-  F  19.38–28.13  [harter Schnitt auf dem Beat: der Besucher schreibt die nächste Frage]  Montage, immer schneller. Jede Runde drei Schnitte auf dem Beat: draußen (Antwort fangen, jubeln, neue Frage malen und reinschnippen) · Buch (hintraben, blättern, Treffer) · Tisch (abmalen, rausschnippen). Runden: 6 Beats, 4,5, 3, dann 2,25. Der Kartenhaufen drinnen und der Stapel draußen wachsen, die Lampe schaukelt. Clawd schwitzt, wird nervös, am Ende kreisen Sterne um den Kopf. Der Besucher wird bei jeder Antwort begeisterter (hüpfen, Herzen, Sternaugen).
+  F  19.38–28.13  [harter Schnitt auf dem Beat: der Besucher schreibt die nächste Frage]  Montage, immer schneller. Jede Runde drei Schnitte auf dem Beat: draußen (Antwort fangen, jubeln, neue Frage malen und reinschnippen) · Buch (hintraben, blättern, Treffer) · Tisch (abmalen, rausschnippen). Runden: 6 Beats, 4,5, 3,25, dann 2,5. Der Kartenhaufen drinnen und der Stapel draußen wachsen, die Lampe schaukelt. Clawd schwitzt, wird nervös, am Ende kreisen Sterne um den Kopf. Der Besucher wird bei jeder Antwort begeisterter (hüpfen, Herzen, Sternaugen).
      reads:  19.38–23.13 Runde 2, ruhig genug, um das Muster zu lesen
              23.13–25.94 Runde 3, schneller, Clawd schwitzt
-             25.94–27.81 Runde 4, sehr schnell, Clawd nervös
-             27.81–28.13 Runde 5 beginnt, Clawd schwindlig
+             25.94–27.97 Runde 4, sehr schnell, Clawd nervös, am Ende schwindlig (Sterne)
+             27.97–28.13 Runde 5 beginnt
 
-  G  28.13–34.38  [Match Cut: dieselbe Zweier-Einstellung wie am Ende von E]  Großer Pull Back: das Zimmer ist ein Kasten mit Kabeln zur Steckdose, oben drauf ein Bildschirm. Eine gerippte Frontklappe rollt herunter und schlägt unten auf (Staub, Wackler): es ist ein Computer (Lüftung, Laufwerksschlitz, grüne LED). Push In auf den Bildschirm: das Gespräch als Chat aus Schnörkeln, links blaue Frage-Blasen, rechts orange Antwort-Blasen, neue ploppen auf, während draußen weiter Karten fliegen.
+  G  28.13–34.38  [Match Cut: dieselbe Zweier-Einstellung wie am Ende von E]  Großer Pull Back: das Zimmer ist ein Kasten mit Kabeln zur Steckdose, oben drauf ein Bildschirm. Eine gerippte Frontklappe rollt herunter und schlägt unten auf (Staub, Wackler): es ist ein Computer (Lüftung, Laufwerksschlitz, grüne LED). Push In auf den Bildschirm: das Gespräch als Chat aus Schnörkeln, links blaue Frage-Blasen mit dem Besucher als kleinem Avatar (Zylinder), rechts orange Antwort-Blasen mit einem goldenen Genie-Avatar, neue ploppen auf, während draußen weiter Karten fliegen.
      reads:  28.13–28.60 Zweier-Einstellung: Herzen draußen, Sterne drinnen
              28.60–30.90 Pull Back: Kasten, Kabel, Bildschirm oben drauf
              30.90–31.90 Klappe rollt runter: ein Computer
              31.90–34.38 Push In: der Bildschirm zeigt einen Chat aus Schnörkeln, neue Blasen ploppen auf
 
   H  34.38–40.00  [Kamerafahrt: Kranschwenk vom Bildschirm hinunter zum Besucher]  Der Besucher bekommt die nächste Antwort, liest, Herzen. Er malt eine neue Frage, schwungvoll und flüssig: dasselbe Zeichen wie am Anfang. Er schnippt sie in den Schlitz, die Kamera fährt mit hinein.
-     reads:  34.38–35.75 Kran runter, die Antwort kommt aus dem Schlitz, der Besucher liest
+     reads:  34.38–35.40 Kran runter (Schlieren), die Antwort kommt aus dem Schlitz, der Besucher nimmt sie
+             35.40–35.75 er liest
              35.75–36.45 Herzen, er wirft die Karte auf den Stapel
-             36.45–37.70 er malt die nächste Frage (das Zeichen vom Anfang)
-             37.70–39.75 Schnipsen, die Karte verschwindet im Schlitz, Push In, Iris in Schlitzform schließt sich
+             36.60–37.70 er holt eine leere Karte und malt die nächste Frage (das Spiralzeichen vom Anfang)
+             37.70–39.10 Ausholen, Schnipsen (38.10), die Karte gleitet langsam in den Schlitz, Push In auf den Schlitz
+             38.95–39.80 Iris in Schlitzform schließt sich, Schwarz bis 40.00
 
   [out: Iris in Schlitzform schließt sich zu Schwarz. Das Video beginnt wieder mit genau dieser Karte, die drinnen durch den Schlitz gleitet.]
 
@@ -95,5 +97,6 @@ Check: jede Einstellung hat ein Ereignis; die Reads liegen hintereinander; jede 
 | 31,0 | Die Klappe fällt: es ist ein Computer |
 | 32,0 | Der Bildschirm zeigt das Gespräch als Chat aus Schnörkeln |
 | 34,4 | Kran hinunter zum Besucher, die nächste Antwort kommt |
-| 36,5 | Der Besucher malt die nächste Frage |
-| 38,1 | Er schnippt sie in den Schlitz, Iris zu, und alles beginnt von vorn |
+| 36,9 | Der Besucher malt die nächste Frage (das Zeichen vom Anfang) |
+| 38,1 | Er schnippt sie in den Schlitz |
+| 39,8 | Iris zu, Schwarz, und alles beginnt von vorn |

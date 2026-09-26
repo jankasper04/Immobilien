@@ -699,7 +699,7 @@
   }
 
   // ---------- shots ----------
-  const TWO = [430, GY - 247, 1.4], WIDE = [772, 880, .74], SCREEN = [850, 12, 1.8], VIS1 = [245, GY - 170, 2.05];
+  const TWO = [418, GY - 255, 1.35], WIDE = [772, 880, .74], SCREEN = [850, 12, 1.8], VIS1 = [245, GY - 170, 2.05];
   // A 0–3.44: the hook: a card slides in through the slot; Clawd wakes; pull back on the room
   function shotA(t, lt) {
     let c;
@@ -781,10 +781,4 @@
 
   shots([[0, shotA], [3.44, shotB], [8.44, shotC], [11.25, shotD], [15.625, shotE], [19.375, shotF], [28.125, shotG], [34.375, shotH]]);
 
-  // a glyph sheet for checking the script (render with --loop=zglyphs)
-  LOOPS.zglyphs = t => {
-    VIEW = { x0: 0, x1: W, y0: 0, y1: H, z: 1 };
-    for (let i = 0; i < NG; i++) { const x = 140 + (i % 4) * 270, y = 180 + Math.floor(i / 4) * 290; boilSeed('gs' + i); paint(rectPts(x - 110, y - 80, 220, 160, 1), { wash: COL.card, ink: PAL.ink, sw: .6 }); glyph(i, x, y, 60, i % 2 ? COL.gA : COL.gQ, 1, 'gg' + i); }
-  };
-  LOOPS.zglyphs.len = 1;
 })();
