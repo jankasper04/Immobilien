@@ -76,7 +76,7 @@
     for (const e of E) paint([at(e, 1 + eh * .72), at(e - .19, 1.0), at(e + .19, 1.0)], { wash: C.pink, washOp: op, ink: null });
     const fx = hx + .1, P = pts => pts.map(([a, b]) => [a * s, b * s]);
     paint(ellPts(fx * s, (hy + .42) * s, .46 * s, .28 * s, 14), { wash: C.light, washOp: op, ink: null });
-    for (const d of [-.32, 0, .32]) inkLine(P([[hx + d, hy - .95 + Math.abs(d) * .25], [hx + d * .8, hy - .6]]), sw * 1.5, C.stripe, 'ink', 0);
+    for (const d of [-.34, 0, .34]) inkLine(P([[hx + d, hy - .93 + Math.abs(d) * .3], [hx + d * .85, hy - .68]]), sw * .75, C.stripe, 'ink', 0);
     // eyes
     const lx = (o.lookX || 0) * .09, ly = (o.lookY || 0) * .09, ey = hy - .04;
     let kinds = o.eyes === 'wink' ? ['open', 'happy'] : [o.eyes || 'open', o.eyes || 'open'];
@@ -93,12 +93,12 @@
       else inkLine(P([[ex - .19, ey - .03], [ex, ey + .1], [ex + .19, ey - .03]]), sw * 1.1, C.ink, 'ink', .5);
     });
     if (o.blush) for (const d of [-.72, .72]) paint(ellPts((fx + d) * s, (hy + .3) * s, .2 * s, .1 * s, 10), { wash: C.pink, washOp: op * o.blush, ink: null });
-    paint(P([[fx - .11, hy + .23], [fx + .11, hy + .23], [fx, hy + .35]]), { wash: C.pink, washOp: op, ink: C.ink, sw: sw * .4 });
+    paint(P([[fx - .1, hy + .24], [fx + .1, hy + .24], [fx, hy + .34]]), { wash: C.pink, washOp: op, ink: null });
     const m = o.mouth || 'w';
     if (m === 'open') {
       paint(ellPts(fx * s, (hy + .55) * s, .15 * s, .15 * s, 12), { wash: mixCol('#4A1F2A', C.body, op < 255 ? .4 : 0), washOp: op, ink: C.ink, sw: sw * .4 });
     } else {
-      inkLine(P([[fx - .22, hy + .46], [fx - .11, hy + .52], [fx, hy + .43], [fx + .11, hy + .52], [fx + .22, hy + .46]]), sw * .7, C.ink, 'ink', .5);
+      inkLine(P([[fx - .2, hy + .45], [fx - .1, hy + .5], [fx, hy + .42], [fx + .1, hy + .5], [fx + .2, hy + .45]]), sw * .45, C.ink, 'inkfine', .5);
       if (m === 'tongue') paint(ellPts((fx + .06) * s, (hy + .6) * s, .09 * s, .11 * s, 10), { wash: C.pink, washOp: op, ink: C.ink, sw: sw * .35 });
     }
     for (const sd of [-1, 1]) for (const k of [0, 1]) inkLine(P([[fx + sd * .5, hy + .36 + k * .12], [fx + sd * 1.45, hy + .24 + k * .32]]), sw * .35, C.ink, 'inkfine', .3);
@@ -161,8 +161,9 @@
     catHead(hx, hy, s, o, C, sw, op);
     if (o.halo) {
       boilSeed(key + 'halo');
-      glow(hx * s, (hy - 1.6) * s, 2.4 * s, '#FFE08A', .55 * o.halo);
-      paint(ellPts(hx * s, (hy - 1.6) * s, .74 * s, .2 * s, 20), { ink: mixCol(o.haloBg || C.body, HALO, o.halo), sw: sw * 2.2 });
+      const hb = hy - 1.9 + .06 * Math.sin(T * 4);
+      glow(hx * s, hb * s, 2.6 * s, '#FFE08A', .6 * o.halo);
+      paint(ellPts(hx * s, hb * s, .9 * s, .27 * s, 24), { ink: mixCol(o.haloBg || C.body, HALO, o.halo), sw: sw * 1.1 });
     }
     pop();
   }
@@ -480,7 +481,7 @@
       glow(BX, BTOP - 30, 700 * (1 - ca / .7 * .5), '#FFE2A0', 1 - ca / .7);
     }
     // the last "both": a pale halo drifts up out of the shut lid
-    if (t > 29.5) { const k = seg(t, 29.5, 31.2), hx = CATX + HEAD[0] * S, hy = BTOP - 60 - 170 * ease(k), al = Math.sin(Math.PI * clamp(k * 1.2)) * .8; if (al > .02) { glow(hx, hy, 90, '#FFE08A', .5 * al); boilSeed('lasthalo'); paint(ellPts(hx, hy, .74 * S, .2 * S, 20), { ink: mixCol(WALL[2], HALO, al), sw: 2.4 }); } }
+    if (t > 29.5) { const k = seg(t, 29.5, 31.2), hx = CATX + HEAD[0] * S, hy = BTOP - 60 - 170 * ease(k), al = Math.sin(Math.PI * clamp(k * 1.2)) * .8; if (al > .02) { glow(hx, hy, 90, '#FFE08A', .5 * al); boilSeed('lasthalo'); paint(ellPts(hx, hy, .9 * S, .27 * S, 24), { ink: mixCol(WALL[2], HALO, al), sw: 1.5 }); } }
     bubble(t);
     camEnd();
     if (ca > 0 && ca < .3) { flushBrush(); flat([[-60, -60], [W + 60, -60], [W + 60, H + 60], [-60, H + 60]], '#FFF3D6', null, .5 * (1 - ca / .3)); }
