@@ -551,7 +551,7 @@
       boilSeed('flip' + f.t.toFixed(2));
       paint([[cx, top + 14], [cx + w * .5, top - 6 - lift], [cx + w, top - lift * .6], [cx + w, bot - lift * .4], [cx + w * .5, bot - 8 - lift * .5], [cx, bot + 6]], { wash: k < .5 ? COL.page : COL.pageDk, ink: PAL.ink, sw: .9 });
       for (let j = 0; j < 3; j++) inkLine([[cx + w * .2, top + 60 + j * 110], [cx + w * .8, top + 50 + j * 110 - lift * .3]], .5, COL.rule, 'inkfine', 0);
-      inkLine(through([[cx + pw * .9, top - 30], [cx + pw * .3 * Math.cos(Math.PI * k), top - 70 - lift], [cx - pw * .6, top - 40]], 4).slice(0, Math.max(2, Math.round(10 * k))), .8, '#FFF5E2', 'dry', .4);
+      inkLine(through([[cx + pw * .9, top - 30], [cx + pw * .3 * Math.cos(Math.PI * k), top - 70 - lift], [cx - pw * .6, top - 40]], 4).slice(0, Math.max(3, Math.round(10 * k))), .8, '#FFF5E2', 'dry', .4);
     }
   }
   // the matching row: rings and light, first around the question glyph, then around the answer
@@ -679,8 +679,8 @@
     for (let i = 0; i < 14; i++) {
       boilSeed('whip' + i);
       const L = 380 + 500 * hash(i + 3);
-      if (dir) { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', .2); }
-      else { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .6; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', .2); }
+      if (dir) { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
+      else { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .6; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
     }
   }
   // the iris is the slot's own shape: a tall rounded opening

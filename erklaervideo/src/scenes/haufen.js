@@ -125,7 +125,7 @@
       const gx = sx - 260 + hash(i + 40) * 520 + 30 * Math.sin(t * .8 + i), gy = HORIZON + 30 + hash(i + 60) * (SHORE - HORIZON - 60);
       if (!inView(gx, gy)) continue;
       boilSeed('glit' + i);
-      inkLine([[gx - 22, gy], [gx + 22, gy + jit(1)]], .8, S.seaHi, 'inkfine', .3);
+      inkLine([[gx - 22, gy], [gx + 22, gy + jit(1)]], .8, S.seaHi, 'inkfine', 0);
     }
     // wet sand, foam, dry sand
     const surf = x => 6 * Math.sin(x * .006 + t * .9) + 10 * Math.sin(t * .7);
@@ -134,7 +134,7 @@
     if (boxIn(x0, SHORE - 30, x1, SHORE + 10)) {
       for (let k = 0; k < 3; k++) {
         const P = []; for (let x = xs; x <= xe; x += 60) P.push([x, SHORE - 12 + surf(x) + 4 * Math.sin(x * .03 + k)]);
-        for (let a = 0; a < P.length - 1; a += 8) { boilSeed('foam' + k + '_' + a); inkLine(P.slice(a, a + 9), 1.1, '#FFF8EC', 'inkfine', .5); }
+        for (let a = 0; a < P.length - 2; a += 8) { boilSeed('foam' + k + '_' + a); inkLine(P.slice(a, a + 9), 1.1, '#FFF8EC', 'inkfine', .5); }
         break;
       }
     }
@@ -142,7 +142,7 @@
     for (let i = 0; i < 16; i++) {
       const px = -500 + hash(i + 3) * 2400, py = SHORE + 120 + hash(i + 13) * 1000; if (!inView(px, py, 40)) continue;
       boilSeed('sd' + i);
-      inkLine([[px - 30, py], [px + 30, py + 3]], 1.1, mixCol(S.sand, S.heapDk, .5), 'dry', .3);
+      inkLine([[px - 30, py], [px + 30, py + 3]], 1.1, mixCol(S.sand, S.heapDk, .5), 'dry', 0);
     }
   }
 
@@ -540,7 +540,7 @@
     for (let i = 0; i < 16; i++) {
       const x = (i + .5) / 16 * W + jit(20), L = 700 + 600 * hash(i + 3), y = H / 2 + (hash(i) - .5) * H * .5;
       boilSeed('whip' + i);
-      inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3.2 * a, i % 3 ? '#FFF4DE' : '#6C5A96', 'dry', .2);
+      inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3.2 * a, i % 3 ? '#FFF4DE' : '#6C5A96', 'dry', 0);
     }
   }
   function iris2([x, y, r]) {

@@ -212,6 +212,7 @@ function paintAt(pts, o) {
   }
 }
 function inkLine(pts, sw = 1, col = PAL.ink, br = 'ink', curv = .5) {
+  if (pts.length < 3) curv = 0;   // p5.brush draws nothing for a two point spline with curvature
   centred(pts, (P) => { brush.noFill(); brush.noWash(); brush.noHatch(); brush.set(br, col, sw); brush.spline(P, curv); });
 }
 
