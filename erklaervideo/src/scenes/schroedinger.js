@@ -215,6 +215,7 @@
     const m = emotions(t, MOOD), p = {};
     if (t > 4.3 && t < 10.8) p.dx = .3 * ease(seg(t, 4.3, 4.8)) * (1 - ease(seg(t, 4.9, 5.3)));
     if (t > 17.95) { const k = seg(t, 18.0, 18.5); p.dx = STEP * ease(k); if (k > 0 && k < 1) { p.walk = STEP * ease(k) / 4 * 1.6; p.view = 'q'; } }
+    if (t > 5.1 && t < 14.5) p.emote = null;   // off screen: no emote floating at the frame edge
     if (t >= 14.5 && t < 16.25) { p.lookY = -1; p.lookX = swapN(t) % 2 ? .75 : -.45; if (t < 15.55) p.emote = null; }
     if (t > REACH[0] && t < REACH[1]) {
       p.aR = kf(t, [[REACH[0], m.aR ?? .2], [19.2, .92], [19.8, .98], [19.95, 1.6], [REACH[1], m.aR ?? 1.1]]) + (t > 19.2 && t < 19.8 ? .03 * Math.sin(t * 60) : 0);
