@@ -17,8 +17,8 @@
   const BOOK = { x0: 160, x1: 500, y0: 1470, y1: 1650, sp: 330 };
   const PL = { x0: 169, x1: 326, y0: 1479, y1: 1641 }, PR = { x0: 334, x1: 491, y0: 1479, y1: 1641 };
   const DRAWN = [247, 1556], DRR = 36;               // the apple drawn in the book
-  const READ = [330, 1580];                          // Clawd on a (hidden) book stack behind the stand
-  const HOLE = [150, 700], FLOOR_SPOT = [643, 1760]; // the light beam through the shutter
+  const READ = [330, 1535];                          // Clawd on a (hidden) book stack behind the stand
+  const HOLE = [150, 700];                          // the light beam through the shutter (it lands where the held prism will be)
   const LEDGE = [452, 1446];                         // where the prism rests
   const MAG_REST = [120, 1672];
   const DOORSPEC = { x: 706, y0: 1200, y1: 1440 };   // where the prism's fan lands on the door
@@ -268,11 +268,15 @@
     const seep = kd <= 0 ? seg(st, SEEP, SEEP + .45) : 0;
     if (seep > 0) {
       const lc = C('#FFF8E6', s), fl = .75 + .25 * Math.sin(t * 9);
-      glow(DOOR.x1, 1200, 170, lc, .55 * seep * fl); glow(DOOR.x1, 1450, 170, lc, .55 * seep * fl); glow(DOOR.cx, FY, 190, lc, .5 * seep * fl);
+      glow(DOOR.x1, 1180, 200, lc, .8 * seep * fl); glow(DOOR.x1, 1440, 200, lc, .8 * seep * fl); glow(DOOR.cx, FY, 240, lc, .75 * seep * fl); glow(DOOR.x0 + 40, DOOR.y0, 160, lc, .5 * seep * fl);
       boilSeed('seep');
-      inkLine([[DOOR.x1 - 2, DOOR.y0 + 6], [DOOR.x1 - 2, (DOOR.y0 + FY) / 2], [DOOR.x1 - 2, FY - 4]], 2.4 * seep, lc, 'dry', .2);
-      inkLine([[DOOR.x0 + 8, FY - 3], [DOOR.cx, FY - 2], [DOOR.x1 - 6, FY - 3]], 2.6 * seep, lc, 'dry', .2);
-      inkLine([[DOOR.x0 + 10, DOOR.y0 + 3], [DOOR.x1 - 8, DOOR.y0 + 3]], 1.4 * seep, lc, 'dry', .2);
+      inkLine([[DOOR.x1 - 3, DOOR.y0 + 6], [DOOR.x1 - 3, (DOOR.y0 + FY) / 2], [DOOR.x1 - 3, FY - 4]], 3.4 * seep, lc, 'dry', .2);
+      inkLine([[DOOR.x0 + 8, FY - 4], [DOOR.cx, FY - 3], [DOOR.x1 - 6, FY - 4]], 3.6 * seep, lc, 'dry', .2);
+      inkLine([[DOOR.x0 + 10, DOOR.y0 + 4], [DOOR.cx, DOOR.y0 + 4], [DOOR.x1 - 8, DOOR.y0 + 4]], 2.2 * seep, lc, 'dry', .2);
+      for (let i = 0; i < 5; i++) {   // rays fanning out under the door
+        const x = lerp(DOOR.x0 + 30, DOOR.x1 - 30, i / 4);
+        inkLine([[x, FY + 2], [x + (x - DOOR.cx) * .5, FY + 60 + 12 * (i % 2)]], 1.6 * seep, lc, 'dry', 0);
+      }
     }
     // casing and threshold
     boilSeed('casing');
@@ -471,7 +475,7 @@
       } else {       // three cone cells, wired to a little brain
         [[-44, '#555555'], [-8, '#7A7A7A'], [28, '#9E9E9E']].forEach(([dx, c]) => {
           paint([[cx + dx, cy - 44], [cx + dx + 13, cy + 6], [cx + dx - 13, cy + 6]], { wash: c, ink: pen, sw: fine });
-          inkLine([[cx + dx, cy + 6], [cx + dx * .3, cy + 38]], fine, pen, 'inkfine', .4);
+          inkLine([[cx + dx, cy + 6], [cx + dx * .3, cy + 38]], fine, pen, 'inkfine', 0);
         });
         paint(ellPts(cx - 4, cy + 52, 30, 18, 18), { wash: '#C8C8C8', ink: pen, sw: fine });
         inkLine([[cx - 22, cy + 50], [cx - 10, cy + 44], [cx, cy + 54], [cx + 12, cy + 46]], fine, pen, 'inkfine', .6);
@@ -597,14 +601,20 @@
     const k = ease(seg(st, 2.3, 2.75));
     return { at: arcPt(hold, [MAG_REST[0] + 20, MAG_REST[1] - 40], 30, k), tip };
   }
+  let FLOOR_SPOT = null;
+  function floorSpot() {
+    if (FLOOR_SPOT) return FLOOR_SPOT;
+    const q = clawdRoom(9.0), p = prismAt(9.0, q).at, e = [p[0] - 14, p[1] - 8], k = (1760 - HOLE[1]) / (e[1] - HOLE[1]);
+    return (FLOOR_SPOT = [HOLE[0] + (e[0] - HOLE[0]) * k, 1760]);
+  }
   function beam(t, st, pr) {
-    const into = pr.held && st >= FAN[0], end = into ? [pr.at[0] - 14, pr.at[1] - 8] : FLOOR_SPOT;
+    const into = pr.held && st >= FAN[0], end = into ? [pr.at[0] - 14, pr.at[1] - 8] : floorSpot();
     if (!inView(Math.min(HOLE[0], end[0]) - 60, HOLE[1], Math.max(HOLE[0], end[0]) + 80, end[1] + 30)) return;
     const s = satAt(400, 1200, 400), dx = end[0] - HOLE[0], dy = end[1] - HOLE[1], d = Math.hypot(dx, dy), nx = -dy / d, ny = dx / d, w0 = 11, w1 = into ? 20 : 34;
     const lc = C(RC.light, s);
     boilSeed('beam');
     paint([[HOLE[0] + nx * w0, HOLE[1] + ny * w0], [end[0] + nx * w1, end[1] + ny * w1], [end[0] - nx * w1, end[1] - ny * w1], [HOLE[0] - nx * w0, HOLE[1] - ny * w0]], { wash: lc, washOp: 150, ink: null });
-    if (!into) paint(ellPts(FLOOR_SPOT[0], FLOOR_SPOT[1], 66, 17, 20, 1), { wash: lc, washOp: 190, ink: null });
+    if (!into) paint(ellPts(end[0], end[1], 66, 17, 20, 1), { wash: lc, washOp: 190, ink: null });
     for (let i = 0; i < 7; i++) {   // dust drifting in the light
       const k = frac(t * .05 + hash(i + 70)), px = lerp(HOLE[0], end[0], k) + nx * (hash(i + 80) - .5) * 2 * lerp(w0, w1, k), py = lerp(HOLE[1], end[1], k) + ny * (hash(i + 80) - .5) * 2 * lerp(w0, w1, k);
       boilSeed('mote' + i);
@@ -665,7 +675,7 @@
       flatW(through(N, 3).concat([[X1 + 100, GGY + 4], [hs, GGY + 4]]), GC.hill);
     }
     if (Y1 > GGY) { flatW(bx4(X0, GGY, X1, Y1 + 50), GC.grass); if (Y1 > GGY + 240) flatW(bx4(X0, GGY + 240, X1, Y1 + 50), GC.grassDk); }
-    if (inView(X0, GGY - 10, X1, GGY + 10)) hline(GGY, X0, X1, .9, PAL.ink, 'ggy');
+    if (inView(X0, GGY - 10, X1, GGY + 10)) hline(GGY, X0, X1, lw(.9, 2.6), PAL.ink, 'ggy');
     TUFTS.forEach((f, i) => {
       if (!inView(f.x - 20, f.y - 30, f.x + 20, f.y)) return;
       const s = satAt(f.x, f.y), sw = wob(t, .4, hash(i) * 3) * 4;
@@ -678,19 +688,19 @@
       boilSeed('fl' + i);
       inkLine([[f.x, f.y], [f.x + sway * .5, f.y - h * .5], [fx, fy]], 1, C('#4F8A3E', s), 'ink', .5);
       const P = []; for (let k = 0; k < 30; k++) { const a = k / 30 * TAU, rr = f.r * (.55 + .45 * Math.abs(Math.cos(a * 2.5))); P.push([fx + Math.cos(a) * rr, fy + Math.sin(a) * rr]); }
-      paint(P, { wash: C(f.c, s), ink: ink(s), sw: .5 });
+      paint(P, { wash: C(f.c, s), ink: ink(s), sw: lw(.5, 2.6) });
       paint(ellPts(fx, fy, f.r * .3, f.r * .3, 10), { wash: C('#E8AA38', s), ink: null });
     });
     // the tree
     if (inView(TREE.x - 450, 150, TREE.x + 450, TREE.base + 20)) {
       const x = TREE.x, b = TREE.base, s = satAt(x, b - 300, 250);
       boilSeed('trunk');
-      paint([[x - 44, b + 8], [x - 27, b - 300], [x - 36, b - 560], [x - 170, b - 790], [x - 148, b - 806], [x - 12, b - 640], [x + 8, b - 840], [x + 30, b - 838], [x + 22, b - 624], [x + 158, b - 800], [x + 178, b - 782], [x + 36, b - 540], [x + 29, b - 300], [x + 46, b + 8]], { wash: C(GC.trunk, s), ink: ink(s), sw: 1.1 });
-      inkLine([[x - 10, b - 60], [x - 4, b - 200], [x - 14, b - 330]], .7, C(GC.trunkDk, s), 'inkfine', .5);
+      paint([[x - 44, b + 8], [x - 27, b - 300], [x - 36, b - 560], [x - 170, b - 790], [x - 148, b - 806], [x - 12, b - 640], [x + 8, b - 840], [x + 30, b - 838], [x + 22, b - 624], [x + 158, b - 800], [x + 178, b - 782], [x + 36, b - 540], [x + 29, b - 300], [x + 46, b + 8]], { wash: C(GC.trunk, s), ink: ink(s), sw: lw(1.1, 2.6) });
+      inkLine([[x - 10, b - 60], [x - 4, b - 200], [x - 14, b - 330]], lw(.7, 2.6), C(GC.trunkDk, s), 'inkfine', .5);
       CROWN.forEach(([cx, cy, rx, ry], i) => {
         const sc = satAt(cx, cy, 160);
         boilSeed('crown' + i);
-        paint(ellPts(cx, cy, rx, ry, 26, 3), { wash: C(i % 2 ? GC.crown : mixCol(GC.crown, GC.crownDk, .35), sc), ink: ink(sc), sw: 1.1 });
+        paint(ellPts(cx, cy, rx, ry, 26, 3), { wash: C(i % 2 ? GC.crown : mixCol(GC.crown, GC.crownDk, .35), sc), ink: ink(sc), sw: lw(1.1, 2.6) });
       });
       for (let i = 0; i < 7; i++) {   // lighter leaf patches
         const lx = 380 + hash(i + 500) * 340, ly = 330 + hash(i + 520) * 320, sc = satAt(lx, ly, 160);
@@ -787,6 +797,8 @@
     // the colour reaches Clawd: a burst of sparkles in every colour
     const ca = st - 24.35;
     if (ca > 0 && ca < .7) for (let i = 0; i < 9; i++) { const a = i / 9 * TAU + .3; sparkle(q.x + Math.cos(a) * (140 + 60 * easeOut(ca / .7)), q.y - 4 * U + Math.sin(a) * (110 + 50 * easeOut(ca / .7)), 22, ca / .7, RAINBOW[i % 7]); }
+    const ga = st - 16.85;   // the apple's first glint: lead the eye to the one red thing
+    if (ga > 0 && ga < .55) sparkle(APPLE_RM[0] - 4, APPLE_RM[1] - 6, 16, ga / .55, '#FFFDF6');
     const pa = st - 10.55;   // proud: a sparkle over the head
     if (pa > 0 && pa < .6) sparkle(q.x + 40, q.y - 9.5 * U, 26, pa / .6, greyOf('#FFF5E2'));
     waveFront('rw');
@@ -822,10 +834,16 @@
     const { x0, x1, y0, y1 } = VIEW;
     flat(bx4(x0 - 80, y0 - 80, x1 + 80, 330), greyOf('#51666A'));
     flat(bx4(x0 - 80, 330, x1 + 80, y1 + 80), greyOf('#5E4A38'));
-    for (let i = 0; i < 8; i++) {   // the shelves inside, in shadow
+    let bxp = -440;   // a shelf of books inside, in shadow
+    for (let i = 0; bxp < 420; i++) {
+      const w = 34 + 26 * hash(i + 60), h = 120 + 70 * hash(i + 63);
       boilSeed('rs' + i);
-      paint(rectPts(-470 + i * 120, -520 + 50 * hash(i + 5), 34 + 30 * hash(i), 150 + 70 * hash(i + 3), 2), { wash: greyOf('#40565A'), ink: null });
+      paint(rectPts(bxp, -420 - h, w, h, 2), { wash: greyOf(['#3E5256', '#48605F', '#384A4E'][i % 3]), ink: greyOf('#2E3A3C'), sw: 1 });
+      bxp += w + 4;
     }
+    boilSeed('rshelf');
+    paint(rectPts(-470, -420, 940, 26, 2), { wash: greyOf('#3A3430'), ink: greyOf('#2E3A3C'), sw: 1 });
+    glow(160, -700, 260, '#FFFFFF', .25);
     boilSeed('revpost');
     paint(rectPts(-560, -960, 120, 1400, 2), { wash: greyOf(RC.wood), ink: greyOf(PAL.ink), sw: 1.4 });
     paint(rectPts(440, -960, 120, 1400, 2), { wash: greyOf(RC.wood), ink: greyOf(PAL.ink), sw: 1.4 });
@@ -835,7 +853,7 @@
     const glints = (uu, sw) => {
       for (const sd of [-1, 1]) {
         const ex = sd * 2.5 * uu + (m.lookX || 0) * uu * .5, ey = -6 * uu + (m.lookY || 0) * uu * .4;
-        apple(ex + .18 * uu, ey + .42 * uu, .34 * uu * seg(t, 20.5, 20.75), { s: 1, sl: 0, key: 'eye' + sd });
+        apple(ex + .16 * uu, ey + .4 * uu, .44 * uu * backOut(seg(t, 20.5, 20.8)), { s: 1, sl: 0, key: 'eye' + sd });
       }
     };
     withPal(0, () => clawd(0, 380, u, { ...m, col: greyOf(PAL.clay), dk: greyOf(PAL.clayDk), lt: greyOf('#F5B394'), tint: null, boilKey: 'R', draw: glints }));
@@ -862,7 +880,7 @@
     roomFrame(t, t, [x + (i - 1) * 6 * lt, y - 3 * lt, z * (1 + .03 * lt), r]);
   }
   // C 6.5–11.6 and D 11.6–16.0: the prism; the pull back to the whole grey room; the light at the door
-  const MED = [365, 1360, 1.5], FANC = [565, 1325, 1.2], PROUD = [372, 1420, 1.62], DOORC = [735, 1430, 1.3];
+  const MED = [372, 1395, 1.95], FANC = [545, 1335, 1.4], PROUD = [360, 1400, 1.85], DOORC = [735, 1430, 1.3];
   function camCD(t) {
     const m = t2 => [MED[0] + 8 * (t2 - 6.5), MED[1] - 6 * (t2 - 6.5), MED[2] * (1 + .01 * (t2 - 6.5))];
     if (t < 7.8) return m(t);

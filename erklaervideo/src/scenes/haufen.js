@@ -8,7 +8,7 @@
   const U = 24, G = 7;                                // Clawd's unit, a grain's radius
   const HORIZON = GY - 470, SHORE = GY - 250;
   const CX0 = HX + K * H0 * .92 + 150;                // Clawd beside the full heap
-  const STAND_D = HX + 190, LIE = HX + 190;           // Clawd by the handful; Clawd lying by the last grain
+  const STAND_D = HX + 168, LIE = HX + 190;           // Clawd by the handful; Clawd lying by the last grain
   const INK = PAL.ink, GRAIN_INK = '#6B4A32';
   const GULL = { body: '#F7F3EA', shade: '#DCDDE3', wing: '#A6B1C1', tip: '#35303C', beak: '#F2C14E', spot: '#D8394E', leg: '#E9A36A' };
 
@@ -88,7 +88,7 @@
     for (const f in A) S[f] = mixCol(A[f], B[f], k);
     return S;
   }
-  const sunOf = d => kf(d, [[12, [HX + 600, GY - 1780]], [16, [HX + 700, GY - 1120]], [18.3, [HX + 720, HORIZON - 30]], [19.2, [HX + 740, HORIZON + 90]]], x => x);
+  const sunOf = d => kf(d, [[12, [HX + 560, GY - 1540]], [15.5, [HX + 640, GY - 1060]], [17, [HX + 690, GY - 720]], [18.3, [HX + 720, HORIZON - 30]], [19.2, [HX + 740, HORIZON + 90]]], x => x);
 
   // ---------- background ----------
   function background(t, S, day) {
@@ -314,8 +314,7 @@
     }
     if (t > FLY[0]) {   // off it goes, with the grain
       const k = seg(t, FLY[0], FLY[1]);
-      g.fly = (t - FLY[0]) * 15; g.x = fx - 900 * Math.pow(k, 1.3); g.y = fy - 60 - 1100 * easeIn(k * .8 + .2 * k); g.r = -.25; g.head = [HEAD_REST[0] + 6, HEAD_REST[1] + 16]; g.ang = 0; g.carry = true; g.open = 0;
-      g.x += -40 * ease(seg(t, FLY[0], FLY[0] + .15)); g.y -= 30 * ease(seg(t, FLY[0], FLY[0] + .15));
+      g.fly = (t - FLY[0]) * 16; g.x = fx - 60 * k - 700 * Math.pow(k, 2.2); g.y = fy - 40 * ease(seg(t, FLY[0], FLY[0] + .12)) - 1000 * Math.pow(k, 1.4); g.r = -.3; g.head = [HEAD_REST[0] + 6, HEAD_REST[1] + 16]; g.ang = 0; g.carry = true; g.open = 0;
     }
     return g;
   }
@@ -331,8 +330,12 @@
       if (k >= 1) { if (p.toss === 'clawd' && inView(b[0], b[1])) { grain(b[0], b[1], S, 77, 'landed'); puff(b[0], b[1] + 4, rel + dur, t); } return; }
       const [x, y] = arcPt(a, b, p.toss === 'clawd' ? 190 : 160, k);
       if (!inView(x, y)) return;
+      if (p.toss === 'clawd') {   // the first grain gets a trail and a glint, so the eye follows it into the next shot
+        const T = [0, 1, 2, 3].map(j => arcPt(a, b, 190, Math.max(0, k - j * .045)));
+        boilSeed('trail'); inkLine(T, 1.4, '#FFF6E2', 'dry', .5);
+        sparkleAt(x + 12, y - 12, 26, frac(t * 2.5));
+      }
       grain(x, y, S, 90 + i, 'fl' + i, { hero: true });
-      if (p.toss === 'clawd') sparkleAt(x + 10, y - 10, 16, frac(t * 3));
     });
   }
   const CLAWD_LAND = [CX0 - 235, GY - 4];
@@ -375,17 +378,17 @@
     [11.55, 'thinking', { lookX: .7, lookY: -.8 }], [11.95, 'neutral', { lookX: .6, lookY: -.5 }], [12.55, 'neutral', { lookX: .5, lookY: -.5 }],
     [13.05, 'suspicious', { lookX: .9, lookY: -.3 }], [13.5, 'nervous', { lookX: .8, lookY: -.3 }],
     [14.4, 'nervous', { lookX: .8, lookY: -.2 }], [15.15, 'thinking', { lookX: .6, lookY: -.3, emote: null }],
-    [17.4, 'confused', { lookX: .8, lookY: .5 }],
+    [17.4, 'confused', { lookX: .8, lookY: .5, emote: null }],
     [20.5, 'surprised', { lookX: .7, lookY: -1 }], [20.85, 'neutral', { lookX: .8, lookY: .8 }],
     [21.0, 'neutral', { lookX: 1, lookY: .55 }], [22.25, 'confused', { lookX: 1, lookY: .4, emote: null }],
-    [24.62, 'dizzy'], [26.45, 'determined', { lookX: .9, lookY: .6 }],
+    [25.22, 'dizzy'], [26.65, 'determined', { lookX: .9, lookY: .6 }],
     [28.25, 'thinking', { lookX: 1, lookY: .6, emote: '?' }], [28.85, 'determined', { lookX: 1, lookY: .6 }],
     [29.45, 'thinking', { lookX: 1, lookY: .6, emote: '?' }], [29.72, 'determined', { lookX: 1, lookY: .6 }],
     [30.66, 'hopeful', { lookX: 1, lookY: .7, emote: '?' }],
   ];
   // checks: [time, strength]: a nod toward the heap
   const NODS = [[4.98, 1], [7.84, .9], [10.04, .8], [12.0, .5], [13.62, .28]];
-  const TICKS = [[4.98, 1, .18, 0], [7.84, 1, .16, 0], [10.04, .9, .2, 0], [12.0, .72, .45, .25], [13.6, .56, .9, 1]];
+  const TICKS = [[4.98, 1, .18, 0], [7.84, 1, .16, 0], [10.04, .92, .2, 0], [12.0, .8, .45, .25], [13.6, .72, .9, 1]];
   function nod(t) {
     let d = 0; for (const [t0, a] of NODS) { const k = seg(t, t0, t0 + .55 + .3 * (1 - a)); if (k > 0 && k < 1) d += a * Math.pow(Math.sin(k * TAU), 2); }
     return d;
@@ -424,7 +427,7 @@
       o.view = 'q'; o.flip = true; o.noLegs = true;
       o.sq = .06 + (o.sq || 0) * .5; o.dy = 2 * (1 - o.sq) + (o.dy || 0) * .25; o.rot = (o.rot || 0) * .4;
       if (t > 26.8) o.aR = kf(t, BUILD_ARM, ease);
-      if (t < 26.9) { o.aR = -1.5; o.aL = -1.4; }
+      if (t < 26.9) { o.aR = -2.0; o.aL = -1.8; }
     }
     return { x, y, o };
   }
@@ -434,10 +437,14 @@
     paint(rectPts(0, -3.5, 72, 7, .5), { wash: '#C99A64', ink: INK, sw: sw * .6 });
     paint(through([[68, -13], [96, -12], [110, 0], [96, 12], [68, 13], [68, -13]], 3), { wash: '#5B93C9', ink: INK, sw: sw * .7 });
   }
-  function stuckSpade() {
+  // let go: the spade topples over its blade and lies in the sand
+  function droppedSpade(t) {
     const c = clawdAt(PLANT), a = armPt(c.x, c.y, U, c.o, 'R', 2.2), b = armPt(c.x, c.y, U, c.o, 'R', 3.2);
+    const a0 = Math.atan2(b[1] - a[1], b[0] - a[0]), tip = [a[0] + Math.cos(a0) * 110, a[1] + Math.sin(a0) * 110];
+    const k = easeIn(seg(t, PLANT, PLANT + .32)), ang = lerp(a0, 0, k) + .08 * spring(t, PLANT + .32, 8, 26);
+    if (!inView(tip[0] - 60, tip[1], 160)) return;
     boilSeed('spade');
-    push(); translate(a[0], a[1] + 24); rotate(Math.atan2(b[1] - a[1], b[0] - a[0])); spade(1.1); pop();
+    push(); translate(tip[0] - Math.cos(ang) * 110, tip[1] - Math.sin(ang) * 110); rotate(ang); spade(1.1); pop();
   }
   function bucket(x) {
     if (!inView(x, GY - 60, 120)) return;
@@ -463,8 +470,8 @@
   function marks(t, c) {
     const [hx, hy] = headOf(c);
     for (const [t0, s, dr, wob] of TICKS) {
-      const a = t - t0; if (a < 0 || a > 1.35) continue;
-      const pop = seg(a, 0, .12) * (1 - seg(a, 1.1, 1.35)), prog = easeOut(seg(a, 0, dr));
+      const life = t0 > 13 ? 1.2 : 1.0, a = t - t0; if (a < 0 || a > life) continue;
+      const pop = seg(a, 0, .12) * (1 - seg(a, life - .22, life)), prog = easeOut(seg(a, 0, dr));
       const col = mixCol('#6FAE5C', PAL.ochre, wob * .5);
       const big = Math.max(1, 1 / Math.pow(Z, .8));
       tickMark(hx - 1.2 * U * big, hy - 2.6 * U * big, U * 1.05 * s * big, prog, pop, col, wob, a, 'tick' + t0);
@@ -474,19 +481,23 @@
       tickMark(hx - 3.6 * U, hy - 2.4 * U, U * (.55 + .35 * Math.max(0, -sd)), 1, k, mixCol('#6FAE5C', PAL.ochre, .35), .5, t, 'torn1');
       emote('?', hx + 1.6 * U, hy - 1.5 * U, U * (.55 + .4 * Math.max(0, sd)), k, t);
     }
-    if (t > 24.7 && t < 26.6) {   // dizzy: a big question mark
-      const k = seg(t, 24.8, 25.1) * (1 - seg(t, 26.4, 26.6));
-      emote('?', hx - 1.5 * U, hy - 3.2 * U, U * 1.35, k, t - 24.8);
+    if (t > 17.4 && t < 20.5) {   // the handful: the question grows with every grain that goes
+      const k = seg(t, 17.5, 17.8) * (1 - seg(t, 20.4, 20.5)), n = countOf(t);
+      emote('?', hx - 1.2 * U, hy - 1.6 * U, U * (.85 + .09 * (10 - n)), k, t - 17.5);
+    }
+    if (t > 25.25 && t < 26.8) {   // dizzy: a big question mark
+      const k = seg(t, 25.3, 25.6) * (1 - seg(t, 26.6, 26.8));
+      emote('?', hx - 1.5 * U, hy - 3.2 * U, U * 1.35, k, t - 25.3);
     }
   }
 
   // ---------- the ghost outlines: every size the heap has been ----------
   const GHOSTS = [30, 60, 110, 180, 270, 380, 510, 660, 810, 950];
   function ghosts(t) {
-    if (t < 22.55 || t > 24.75) return;
-    const n = GHOSTS.length, scan = seg(t, 24.05, 24.55), hi = scan > 0 && scan < 1 ? n - 1 - Math.floor(scan * n) : -1;
+    if (t < 22.55 || t > 25.2) return;
+    const n = GHOSTS.length, scan = seg(t, 24.15, 24.95), hi = scan > 0 && scan < 1 ? n - 1 - Math.floor(scan * n) : -1;
     GHOSTS.forEach((gh, i) => {
-      const ta = 22.6 + i * .15, k = easeOut(seg(t, ta, ta + .35)); if (k <= 0) return;
+      const ta = 22.62 + i * .125, k = easeOut(seg(t, ta, ta + .35)); if (k <= 0) return;
       const h = gh * k, w = K * gh, P = [];
       if (!boxIn(HX - w, GY - h, HX + w, GY)) return;
       for (let j = 0; j <= 24; j++) { const v = -1 + 2 * j / 24, x = HX + Math.sign(v) * Math.pow(Math.abs(v), 1.2) * w; P.push([x, GY - h * shapeOf(Math.abs(x - HX) / w)]); }
@@ -504,13 +515,14 @@
     const disc = t >= DISC;
     if (!disc) heapShadow(h, S, day);
     bucket(CX0 + 175);
-    if (t > PLANT) stuckSpade();
+    if (t > PLANT) droppedSpade(t);
     if (!disc) {
       heapBody(h, S, day);
       const pk = peckOf(t), g0 = pk && !pk.slot && t < pk.tp ? peakGrain(heightOf(pk.tp)) : null;
       ridge(h, S, pk && t >= pk.tp && !pk.slot ? peakGrain(h) : null);
       if (g0 && inView(...g0)) { grain(g0[0], g0[1], S, 5, 'peak', { hero: true }); if (t < .62) sparkleAt(g0[0] + 7, g0[1] - 7, 9, seg(t, .05, .55)); }
     }
+    if (t > 20.9 && t < 26.6) { const [lx, ly] = slot(ORDER[0]); glow(lx, ly - 2, 46 + 8 * Math.sin(t * 3), '#FFD9A0', .55 * seg(t, 20.9, 21.4)); }
     handful(t, S);
     ghosts(t);
     // Clawd
@@ -537,10 +549,10 @@
   }
   function whipFX(k) {
     const a = Math.sin(Math.PI * clamp(k)); if (a < .05) return;
-    for (let i = 0; i < 16; i++) {
-      const x = (i + .5) / 16 * W + jit(20), L = 700 + 600 * hash(i + 3), y = H / 2 + (hash(i) - .5) * H * .5;
+    for (let i = 0; i < 11; i++) {
+      const x = (i + .5) / 11 * W + jit(30), L = 600 + 700 * hash(i + 3), y = H / 2 + (hash(i) - .5) * H * .6;
       boilSeed('whip' + i);
-      inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3.2 * a, i % 3 ? '#FFF4DE' : '#6C5A96', 'dry', 0);
+      inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 2.4 * a, i % 4 ? '#FFF4DE' : '#F2C49A', 'dry', 0);
     }
   }
   function iris2([x, y, r]) {
@@ -580,24 +592,24 @@
   // C2 14.4–17.4: a small pile. Torn.
   function shotC2(t) { const lt = t - 14.4; frame(t, [HX + 175, GY - 175, 1.72 + .03 * lt]); }
   // D 17.4–21.0: a handful; the gull flies off with the second-to-last grain
-  function shotD(t) { const lt = t - 17.4; frame(t, [HX + 70, GY - 105, 2.55 + .06 * lt]); }
-  // E 21.0–26.4: the last grain; all the heap's outlines; dizzy
-  const E1 = [HX + 60, GY - 62, 3.2], TOP = [HX + 80, GY - 560, .7], E3 = [LIE - 20, GY - 120, 2.2];
+  function shotD(t) { const lt = t - 17.4; frame(t, [HX + 62, GY - 125 - 40 * ease(seg(t, 20.5, 20.95)), 2.02 + .06 * lt]); }
+  // E 21.0–26.6: the last grain; all the heap's outlines; the search for the boundary; dizzy
+  const E1 = [HX + 52, GY - 60, 3.9], TOP = [HX + 80, GY - 480, .72], E3 = [LIE - 30, GY - 115, 2.3];
   function shotE(t) {
     let c, fx = {};
-    if (t < 22.5) c = [E1[0], E1[1], E1[2] + .1 * (t - 21.0)];
-    else if (t < 24.1) c = camMix([E1[0], E1[1], E1[2] + .15], TOP, ease(seg(t, 22.5, 24.05)));
-    else if (t < 24.62) { const k = easeIn(seg(t, 24.2, 24.62)); c = [TOP[0], lerp(TOP[1], TOP[1] + 500, k), TOP[2]]; fx.whip = k * .5; }
-    else { const k = seg(t, 24.62, 24.85); c = [E3[0] + 12 * Math.sin(t * 2.2), E3[1] - 60 * (1 - easeOut(k)), E3[2], .025 * Math.sin(t * 3.1)]; if (k < 1) fx.whip = .5 + k * .5; }
+    if (t < 22.5) c = [E1[0], E1[1], E1[2] + .12 * (t - 21.0)];
+    else if (t < 24.95) c = camMix([E1[0], E1[1], E1[2] + .18], [TOP[0], TOP[1] + 40 * ease(seg(t, 24.15, 24.95)), TOP[2] * (1 + .05 * seg(t, 23.9, 24.95))], ease(seg(t, 22.5, 23.9)));
+    else if (t < 25.2) { const k = easeIn(seg(t, 24.95, 25.2)); c = [TOP[0], lerp(TOP[1] + 40, TOP[1] + 520, k), TOP[2] * 1.05]; fx.whip = k * .5; }
+    else { const k = seg(t, 25.2, 25.45); c = [E3[0] + 12 * Math.sin(t * 2.2), E3[1] - 70 * (1 - easeOut(k)), E3[2], .03 * Math.sin(t * 3.1)]; if (k < 1) fx.whip = .5 + k * .5; }
     frame(t, c, fx);
   }
   // F 26.4–32.0: grain by grain, again. Push in to the new pile; iris shut on its top grain.
-  const F1 = [HX + 115, GY - 115, 2.0], F2 = [HX + 52, GY - 58, 4.1];
+  const F1 = [HX + 66, GY - 45, 2.9], F2 = [HX + 32, GY - 58, 4.1];
   function shotF(t) {
-    const c = t < 29.6 ? [F1[0], F1[1], F1[2] + .04 * (t - 26.4)] : camMix([F1[0], F1[1], F1[2] + .128], [F2[0], F2[1], F2[2] + .15 * seg(t, 30.5, 32)], ease(seg(t, 29.6, 30.45)));
+    const c = t < 29.6 ? [F1[0] - 4 * (t - 26.6), F1[1], F1[2] + .05 * (t - 26.6)] : camMix([F1[0] - 12, F1[1], F1[2] + .15], [F2[0], F2[1], F2[2] + .15 * seg(t, 30.5, 32)], ease(seg(t, 29.6, 30.45)));
     const top = slot(PLACE[2].s), at = scr(top, c);
     frame(t, c, t > 31.2 ? { iris: [at[0], at[1], lerp(1300, 0, easeIn(seg(t, 31.2, 31.92)))] } : {});
   }
 
-  shots([[0, shotA], [3.6, shotB1], [6.0, shotB2], [7.2, shotB3], [8.4, shotC], [14.4, shotC2], [17.4, shotD], [21.0, shotE], [26.4, shotF]]);
+  shots([[0, shotA], [3.6, shotB1], [6.0, shotB2], [7.2, shotB3], [8.4, shotC], [14.4, shotC2], [17.4, shotD], [21.0, shotE], [26.6, shotF]]);
 })();

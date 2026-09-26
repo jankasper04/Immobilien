@@ -28,7 +28,7 @@ Shots:
      B2 6.0–7.2  [harter Schnitt im Takt]  Nah auf die Möwe auf der Spitze: sie pickt auf den Schlag das nächste Korn (6.6) und wirft es über die Schulter. · Kamera: Push In.
      B3 7.2–8.4  [harter Schnitt im Takt]  Clawd, schneller: kurzer Blick, Nicken, Haken (7.9). Gelassen. · Kamera: Drift.
 
-  C  8.4–14.4  [Übergang: Kamera fährt aus der Halbnahen zurück in die hohe Zweiereinstellung, die Zeit beginnt zu rasen]  Zeitraffer. Wolken rasen, die Sonne sinkt, der Schatten wird länger, die Möwe pickt im Achteltakt, ein Springbrunnen aus Körnern fliegt nach links weg. Der Haufen schrumpft, Clawd rückt mit dem Fuß des Haufens nach. Clawd steckt die Schaufel in den Sand. Bei jeder Prüfung hält die Welt kurz an: Blick, Nicken, Haken. Die Prüfungen werden zögerlicher: der Haken kleiner, langsamer gemalt, zittrig, Clawd nervös mit Schweißtropfen. · Kamera: Kranfahrt nach unten mit der Spitze des Haufens, dabei Push In.
+  C  8.4–14.4  [Übergang: Kamera fährt aus der Halbnahen zurück in die hohe Zweiereinstellung, die Zeit beginnt zu rasen]  Zeitraffer. Wolken rasen, die Sonne sinkt, der Schatten wird länger, die Möwe pickt im Achteltakt, ein Springbrunnen aus Körnern fliegt nach links weg. Der Haufen schrumpft, Clawd rückt mit dem Fuß des Haufens nach. Clawd lässt die Schaufel los, sie kippt in den Sand. Bei jeder Prüfung hält die Welt kurz an: Blick, Nicken, Haken. Die Prüfungen werden zögerlicher: der Haken kleiner, langsamer gemalt, zittrig, Clawd nervös mit Schweißtropfen. · Kamera: Kranfahrt nach unten mit der Spitze des Haufens, dabei Push In.
      reads:  8.4–9.8   die Zeit rast (Wolken, Sonne, Möwe pickt schnell), der Haufen wird kleiner
              9.8–10.7  Prüfung 1: Nicken, Haken
              10.7–11.6 weiter Zeitraffer
@@ -45,17 +45,17 @@ Shots:
              19.6–20.5 die letzten Körner, langsam
              20.5–21.0 die Möwe fliegt weg, ein einziges Korn bleibt
 
-  E  21.0–26.4  [Schnitt auf Aktion: Clawd lässt sich fallen]
-     E1 21.0–22.5  ECU: Clawd liegt im Sand, ein riesiges Auge neben dem einen Korn. Starrt. Blinzelt. · Kamera: sehr langsamer Push In.
-     E2 22.5–24.6  Kranfahrt nach oben und Pull Back: über dem Korn erscheinen die Umrisse des Haufens in allen Größen, ineinander geschachtelt wie Jahresringe, von klein bis riesig. Ganz oben hält die Kamera. Ein Leuchten läuft die Umrisse von groß nach klein hinunter und findet keine Grenze. · Kamera: Kran hoch, dann Whip Pan nach unten mit Wischern.
-     E3 24.6–26.4  [Whip Pan]  Nah: Clawd sitzt da, schwindlig (Spiralaugen, Sterne), ein großes „?“. · Kamera: leichtes Schaukeln.
+  E  21.0–26.6  [Schnitt auf Aktion: Clawd lässt sich fallen]
+     E1 21.0–22.5  ECU in Bodenhöhe: Clawd liegt auf dem Bauch im Sand, das eine Korn leuchtet warm im Abendlicht, daneben Clawds großes Auge. Starrt. Blinzelt. · Kamera: sehr langsamer Push In.
+     E2 22.5–25.2  Kranfahrt nach oben und Pull Back: über dem Korn wachsen die Umrisse des Haufens in allen Größen aus dem Sand, ineinander geschachtelt wie Jahresringe, von klein bis riesig, hinten geht die Sonne unter. Die Kamera hält. Ein goldenes Leuchten läuft die Umrisse von groß nach klein hinunter bis zum Korn und findet keine Grenze. · Kamera: Kran hoch, Halt, dann Whip Pan nach unten mit Wischern (24.95).
+     E3 25.2–26.6  [Whip Pan]  Nah: Clawd liegt da, schwindlig (Spiralaugen, Sterne), ein großes „?“. · Kamera: leichtes Schaukeln.
      reads:  21.0–22.5 Clawd starrt auf das eine Korn
              22.5–24.1 alle Umrisse des Haufens stehen übereinander: wo war die Grenze?
-             24.1–24.6 der Blick sucht von groß nach klein, keine Grenze
-             24.6–26.4 Clawd ist schwindlig und ratlos
+             24.15–24.95 das Leuchten sucht von groß nach klein, keine Grenze
+             25.2–26.6 Clawd ist schwindlig und ratlos
 
-  F  26.4–32.0  [Schnitt aus dem Schwindel: Clawd schüttelt sich]  Dämmerung. Clawd wird entschlossen, hebt ein Korn vom Strand auf und legt es neben das eine (28.2): zwei. Kopf schief, „?“. Noch eins (29.4): drei. Die Kamera fährt in die Nahaufnahme, Clawds Arm legt das vierte Korn oben auf das Häufchen (30.6), Clawds großes Auge schaut zu: ist es jetzt ein Haufen? · Kamera: Push In bis zur ECU, wie am Anfang.
-     reads:  26.4–27.3 Clawd schüttelt den Schwindel ab, entschlossen
+  F  26.6–32.0  [Schnitt auf Aktion: Clawd schüttelt den Schwindel ab]  Dämmerung. Clawd, noch auf dem Bauch, wird entschlossen, zupft ein Korn aus dem Strand und lässt es neben das eine fallen (28.2): zwei. „?“. Noch eins (29.4): drei. Die Kamera fährt in die Nahaufnahme, Clawds Arm legt das vierte Korn oben auf das Häufchen (30.6), Clawds großes Auge schaut zu, ein „?“: ist es jetzt ein Haufen? · Kamera: Push In bis zur ECU, wie am Anfang.
+     reads:  26.6–27.3 Clawd schüttelt den Schwindel ab, entschlossen
              27.3–28.2 hebt ein Korn auf und legt es dazu: zwei
              28.2–29.0 Clawd prüft: „?“
              29.0–29.6 drittes Korn, schneller
@@ -83,7 +83,7 @@ Check:
 | 5.0 | Nicken, grüner Haken: ja |
 | 6.6 | Die Möwe pickt das nächste Korn |
 | 7.9 | Nicken, Haken: immer noch ein Haufen |
-| 8.4 | Zeitraffer beginnt: Wolken rasen, Sonne sinkt, die Möwe pickt ohne Pause |
+| 8.4 | Zeitraffer beginnt: die Sonne sinkt, der Himmel wird golden, die Möwe pickt ohne Pause |
 | 10.1 | Prüfung: Haken |
 | 12.0 | Prüfung: kleinerer Haken, zögerlicher |
 | 13.5 | Prüfung: der Haken zittert, Schweißtropfen |
@@ -93,9 +93,9 @@ Check:
 | 20.4 | Die Möwe nimmt das vorletzte Korn und fliegt davon |
 | 21.0 | Ein einziges Korn. Clawd starrt es an |
 | 22.5–24.1 | Alle Umrisse des Haufens übereinander: wann hat er aufgehört, ein Haufen zu sein? |
-| 24.1–24.6 | Der Blick sucht die Grenze und findet keine |
-| 24.6 | Clawd schwindlig, großes „?“ |
-| 26.4 | Clawd schüttelt sich, entschlossen |
+| 24.15–24.95 | Ein Leuchten sucht die Grenze von groß nach klein und findet keine |
+| 25.2 | Clawd schwindlig, großes „?“ |
+| 26.6 | Clawd schüttelt sich, entschlossen |
 | 28.2 | Clawd legt ein Korn dazu: zwei |
 | 29.4 | Drei |
 | 30.6 | Das vierte Korn auf der Spitze: ab welchem Korn ist es ein Haufen? |

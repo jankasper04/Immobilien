@@ -8,7 +8,7 @@
   // ---------- world ----------
   const GY = 1500, U = 22, VU = 19;                            // the floor line; Clawd's and the visitor's size units
   const WL0 = 330, WL1 = 400, WR0 = 1300, WR1 = 1370;          // the box's left and right walls (outer and inner faces)
-  const TOP0 = 30, TOP1 = 100, BOT1 = GY + 24;                 // roof slab, plinth
+  const TOP0 = 280, TOP1 = 350, BOT1 = GY + 24;                 // roof slab, plinth
   const SY = GY - 125, SLOT_H = 84, HY0 = SY - SLOT_H / 2, HY1 = SY + SLOT_H / 2;   // the slot through the left wall
   const SURF = GY - 83;                                        // desk top inside = ledge top outside = the slot's floor
   const DESK_X0 = 400, DESK_X1 = 660, LEDGE_X0 = 190;
@@ -17,7 +17,7 @@
   const ARRIVE = 600, PAINT_X = 600, LEDGE_X = 250;
   const BOOK = { cx: 930, top: GY - 650, bot: GY - 190, pw: 250 }, ROWS = [95, 230, 365];
   const LAMP = { x: 690, y: 880 };
-  const MON = { x0: 560, x1: 1140, y0: -452, y1: -20, sx0: 602, sx1: 1098, sy0: -414, sy1: -58 };
+  const MON = { x0: 560, x1: 1140, y0: -202, y1: 230, sx0: 602, sx1: 1098, sy0: -164, sy1: 192 };
   const SOCKET = [1462, GY - 150];
   const NG = 24;                                               // glyphs in the invented script
   const COL = {
@@ -292,10 +292,10 @@
       p = turn(t, e.pu + .32, e.pu + .46, -.25, 0);
       if (e === EX[0] && t > 15.4) {                         // shot E: fish the question off the heap and puzzle over it
         x = kf(t, [[15.45, CX_D], [15.8, 668], [19.3, 668], [19.7, CX_D]]);
-        p = { view: 'front', aL: kf(t, [[15.45, .2], [15.85, -.9], [16.2, 1.0], [19.3, 1.0], [19.45, -.3], [19.7, .2]]), sq: .16 * Math.sin(Math.PI * seg(t, 15.5, 16.15)) };
+        p = { view: 'front', aL: kf(t, [[15.45, .2], [15.85, -.9], [16.2, 1.3], [19.3, 1.3], [19.45, -.3], [19.7, .2]]), sq: .16 * Math.sin(Math.PI * seg(t, 15.5, 16.15)) };
         if (t > 16.95 && t < 17.9) {                         // the shrug: both arms up, the body pops up and drops
           const k = seg(t, 16.95, 17.9), up = Math.sin(Math.PI * clamp(k * 1.25));
-          p.aR = kf(t, [[16.95, 1.5], [17.08, .45], [17.6, .45], [17.9, 1.5]]); p.aL = kf(t, [[16.95, 1.0], [17.08, .55], [17.6, .55], [17.9, 1.0]]);
+          p.aR = kf(t, [[16.95, 1.5], [17.08, .45], [17.6, .45], [17.9, 1.5]]); p.aL = kf(t, [[16.95, 1.3], [17.08, .75], [17.6, .75], [17.9, 1.3]]);
           p.dy = -.45 * up; p.sq = -.1 * up + .12 * Math.exp(-(t - 17.6) * 9) * (t > 17.6 ? 1 : 0);
         }
       }
@@ -308,10 +308,11 @@
 
   // ---------- the visitor ----------
   const VEV = [];                                            // the visitor's timeline of actions
-  for (const e of EX) {
+  EX.forEach((e, i) => {
+    const pts = i ? EX[i - 1].ts : -9;
     if (e.ca < 90) VEV.push([e.ca - .3, 'reach', e], [e.ca, 'lift', e], [e.rd, 'read', e], [e.rx, 'react', e], [e.ts - Math.min(.3, (e.ts - e.rx) * .45), 'toss', e], [e.ts + .08, 'free', e]);
-    VEV.push([e.bv - Math.min(.2, (e.bv - (e.ts || -9)) * .5), 'turn', e], [e.bv, 'blank', e], [e.w0, 'write', e], [e.w1, 'wind', e], [e.fl, 'flick', e], [e.fl + .3, 'wait', e]);
-  }
+    VEV.push([e.bv - Math.min(.2, (e.bv - pts - .08) * .6), 'turn', e], [e.bv, 'blank', e], [e.w0, 'write', e], [e.w1, 'wind', e], [e.fl, 'flick', e], [e.fl + .3, 'wait', e]);
+  });
   VEV.sort((a, b) => a[0] - b[0]);
   function visitorAt(t) {
     const m = emotions(t, MOOD_V);
@@ -402,10 +403,10 @@
     }
   }
   function cables(t) {
-    if (!vis(1100, -300, 1800, GY + 40)) return;
+    if (!vis(1100, -100, 1800, GY + 40)) return;
     boilSeed('cab1'); paint(ribbon([[WR1 - 20, GY - 430], [WR1 + 70, GY - 360], [WR1 + 50, GY - 80], [SOCKET[0] - 70, GY - 14], [SOCKET[0], SOCKET[1] + 60], [SOCKET[0], SOCKET[1] + 8]], 16, 14), { wash: COL.cable, ink: PAL.ink, sw: .6 });
     boilSeed('cab2'); paint(ribbon([[WR1 - 20, GY - 560], [WR1 + 150, GY - 520], [WR1 + 170, GY - 120], [WR1 + 320, GY - 14], [WR1 + 700, GY - 10]], 12, 12), { wash: '#5A5462', ink: PAL.ink, sw: .6 });
-    boilSeed('cab3'); paint(ribbon([[MON.x1 - 30, -180], [MON.x1 + 90, -120], [WR1 + 40, -20], [WR1 + 60, 200], [WR1 - 20, 330]], 12, 12), { wash: COL.cable, ink: PAL.ink, sw: .6 });
+    boilSeed('cab3'); paint(ribbon([[MON.x1 - 30, 70], [MON.x1 + 90, 130], [WR1 + 40, 230], [WR1 + 60, 450], [WR1 - 20, 580]], 12, 12), { wash: COL.cable, ink: PAL.ink, sw: .6 });
     boilSeed('plug'); paint(rectPts(SOCKET[0] - 14, SOCKET[1] - 4, 28, 30, .5), { wash: '#4A4652', ink: PAL.ink, sw: .6 });
   }
   function monitor(t) {
@@ -423,10 +424,10 @@
   function chat(t) {
     let n = 0; while (n < MSGS.length && MSGS[n].t <= t) n++;
     if (!n) return;
-    const last = MSGS[n - 1].t, slide = 1 - ease(seg(t, last, last + .22)), pop = backOut(seg(t, last + .12, last + .38)), BH = 76, BW = 196, P = 88, yb = MON.sy1 - 16 - BH / 2;
+    const last = MSGS[n - 1].t, slide = 1 - ease(seg(t, last, last + .22)), popK = backOut(seg(t, last + .12, last + .38)), BH = 76, BW = 196, P = 88, yb = MON.sy1 - 16 - BH / 2;
     for (let j = 0; j < Math.min(n, 6); j++) {
       const mg = MSGS[n - 1 - j], cy = yb - j * P + (j ? slide * P : 0), top = cy - BH / 2;
-      const sc = (j ? 1 : pop) * clamp((top - MON.sy0 - 4) / 30); if (sc < .05) continue;
+      const sc = (j ? 1 : popK) * clamp((top - MON.sy0 - 4) / 30); if (sc < .05) continue;
       const q = mg.side === 'q', cx = q ? MON.sx0 + 22 + BW / 2 : MON.sx1 - 22 - BW / 2;
       push(); translate(cx, cy); scale(sc);
       boilSeed('bub' + (n - 1 - j));
@@ -442,7 +443,7 @@
     const vx0 = Math.max(WL1, VIEW.x0 - 20), vx1 = Math.min(WR0, VIEW.x1 + 20), vy0 = Math.max(TOP1, VIEW.y0 - 20), vy1 = Math.min(GY, VIEW.y1 + 20);
     flat(box(vx0, vy0, vx1 - vx0, vy1 - vy0), COL.cubby);
     const CWd = 150, RH = 150, bookBox = [BOOK.cx - BOOK.pw - 30, BOOK.top - 20, BOOK.cx + BOOK.pw + 30, BOOK.bot + 20];
-    for (let j = 1; j <= 9; j++) {
+    for (let j = 1; TOP1 + j * RH <= GY - 60; j++) {
       const py = TOP1 + j * RH;
       if (py < VIEW.y0 - 30 || py - RH > VIEW.y1 + 30) continue;
       for (let i = 0; i < 6; i++) {
@@ -460,7 +461,7 @@
       }
     }
     for (let i = 0; i <= 6; i++) { const x = WL1 + i * CWd; if (x > VIEW.x0 - 20 && x < VIEW.x1 + 20) flat(box(x - 7, vy0, 14, vy1 - vy0), COL.woodDk); }
-    for (let j = 1; j <= 9; j++) {
+    for (let j = 1; TOP1 + j * RH <= GY - 60; j++) {
       const py = TOP1 + j * RH; if (py < VIEW.y0 - 20 || py > VIEW.y1 + 20) continue;
       flat(box(vx0, py, vx1 - vx0, 14), COL.wood);
       edge([vx0, py], [vx1, py], .7, PAL.ink, 'plank' + j, 'inkfine');
@@ -663,11 +664,11 @@
       clawd(Cp.x, GY, U, { ...Cp.o, boilKey: 'C' });
       for (const c of cards) if (c.held === 'C') card(c.x, c.y, c.rot, c.g, c.kind, c.gk, c.key);
       const e = exC(t);
-      if (t > e.p0 - .1 && t < e.p1 + .08) { const [hx, hy] = armTip(Cp.x, GY, U, Cp.o, 'L'), k = paintK(e, t), [gx, gy] = glyphHead(e.a, k); brushTool(hx, hy, PAINT_X + gx * 24, REST_Y + gy * 24, COL.gA, 'brushC'); }
+      if (t > e.p0 - .03 && t < e.p1 + .05) { const [hx, hy] = armTip(Cp.x, GY, U, Cp.o, 'L'), k = paintK(e, t), [gx, gy] = glyphHead(e.a, k); brushTool(hx, hy, PAINT_X + gx * 24, REST_Y + gy * 24, COL.gA, 'brushC'); }
     }
     clawd(Vp.x, GY, VU, { ...Vp.o, boilKey: 'V' });
     for (const c of cards) if (c.held === 'V') card(c.x, c.y, c.rot, c.g, c.kind, c.gk, c.key);
-    for (const e of EX) if (t > e.w0 - .1 && t < e.w1 + .08) { const [hx, hy] = armTip(Vp.x, GY, VU, Vp.o, 'L'), [gx, gy] = glyphHead(e.q, seg(t, e.w0, e.w1)); brushTool(hx, hy, LEDGE_X + gx * 24, REST_Y + gy * 24, COL.gQ, 'brushV'); }
+    for (const e of EX) if (t > e.w0 - .03 && t < e.w1 + .05) { const [hx, hy] = armTip(Vp.x, GY, VU, Vp.o, 'L'), [gx, gy] = glyphHead(e.q, seg(t, e.w0, e.w1)); brushTool(hx, hy, LEDGE_X + gx * 24, REST_Y + gy * 24, COL.gQ, 'brushV'); }
     thought(t);
     panel(t);
     monitor(t);
@@ -691,15 +692,16 @@
   }
 
   // ---------- shots ----------
-  const TWO = [405, GY - 270, 1.25], WIDE = [772, 575, .74], SCREEN = [850, -238, 1.8], VIS1 = [245, GY - 170, 2.05];
+  const TWO = [430, GY - 247, 1.4], WIDE = [772, 880, .74], SCREEN = [850, 12, 1.8], VIS1 = [245, GY - 170, 2.05];
   // A 0–3.44: the hook: a card slides in through the slot; Clawd wakes; pull back on the room
   function shotA(t, lt) {
     let c;
-    if (t < 1.25) c = [lerp(392, 598, ease(seg(t, .05, 1.3))), SY + 6, lerp(3.4, 2.9, ease(seg(t, 0, 1.25)))];
-    else if (t < 2.05) c = mixCam([594, SY + 6, 2.92], [655, GY - 150, 2.05], ease(seg(t, 1.25, 1.8)));
-    else c = mixCam([655, GY - 150, 2.05], [850, 1150, 1.1], ease(seg(t, 2.05, 3.35)));
+    if (t < .5) c = [lerp(398, 440, ease(seg(t, 0, .5))), SY + 4, lerp(4.0, 3.7, seg(t, 0, .5))];
+    else if (t < 1.25) c = mixCam([440, SY + 4, 3.7], [655, SY - 10, 2.55], ease(seg(t, .5, 1.25)));
+    else if (t < 2.05) c = mixCam([655, SY - 10, 2.55], [655, GY - 150, 2.05], ease(seg(t, 1.25, 1.8)));
+    else c = mixCam([655, GY - 150, 2.05], [850, 1170, 1.1], ease(seg(t, 2.05, 3.35)));
     frame(t, c);
-    if (lt < .45) { const [sx, sy] = scr([(WL0 + WL1) / 2, SY], c); slotIris(sx, sy, lerp(0, 1500, easeIn(lt / .45))); }
+    if (lt < .42) { const [sx, sy] = scr([(WL0 + WL1) / 2, SY], c); slotIris(sx, sy, lerp(0, 1500, ease(lt / .42))); }
   }
   // B 3.44–8.44: to the book, flipping, the match, the answer beside it
   function shotB(t) {
@@ -714,7 +716,7 @@
   }
   // C 8.44–11.25: whip back to the desk; the copy; the flick
   function shotC(t) {
-    const close = [BOOK.cx + 186, GY - 262, 3.3], desk = [640, GY - 150, 2.1], near = [612, GY - 128, 2.55];
+    const close = [BOOK.cx + 186, GY - 262, 3.3], desk = [668, GY - 150, 2.1], near = [656, GY - 132, 2.4];
     let c, wk = null;
     if (t < 8.85) { const k = seg(t, 8.44, 8.85); wk = [k, -1]; c = mixCam(close, desk, ease(k)); }
     else if (t < 10.6) c = mixCam(desk, near, ease(seg(t, 8.85, 10.45)));
@@ -733,7 +735,7 @@
   // E 15.63–19.38: the truth: Clawd has no idea; pull back through the wall to the two-shot
   function shotE(t) {
     let c;
-    const med = t2 => [682 - 6 * (t2 - 15.625), GY - 165, 2.25 + .03 * (t2 - 15.625)];
+    const med = t2 => [652 - 6 * (t2 - 15.625), GY - 165, 2.25 + .03 * (t2 - 15.625)];
     if (t < 17.8) c = med(t);
     else c = mixCam(med(17.8), TWO, ease(seg(t, 17.8, 19.0)));
     if (t > 19.0) c = [TWO[0], TWO[1], TWO[2] * (1 + .02 * (t - 19.0))];
@@ -746,7 +748,7 @@
     if (t < T) { const l = t - e.S; return alt ? [VX + 70 + 10 * l, GY - 175, 2.0 + .06 * l] : [VX + 95 - 10 * l, GY - 160, 2.25 + .06 * l]; }
     if (t < T + .56 * e.C) { const l = t - T; return alt ? [CX_B - 40 + 14 * l, GY - 330, 1.38 + .05 * l] : [CX_B + 30 - 14 * l, GY - 290, 1.55 + .05 * l, .02]; }
     const l = t - T - .56 * e.C;
-    return alt ? [640 - 10 * l, GY - 150, 2.15 + .08 * l, -.02] : [612 + 10 * l, GY - 168, 1.92 + .08 * l];
+    return alt ? [676 - 10 * l, GY - 150, 2.15 + .08 * l, -.02] : [650 + 10 * l, GY - 168, 1.92 + .08 * l];
   }
   function shotF(t) { frame(t, montCam(t)); }
   // G 28.13–34.38: the two-shot again; pull back: the room is a box; the panel drops: a computer; the chat on its screen

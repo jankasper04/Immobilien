@@ -9,7 +9,7 @@
   const U = 24, CX = 540, SY = 1560;              // Clawd's size unit, x and ground (feet)
   const GY = 1470, CURB = 1668, FX = 820;         // foot of the house fronts, the kerb, where the friend stops
   const RIM = 7.7;                                // the helmet's rim on the head, in u above the feet
-  const HOVER = SY - 10.9 * U, Y0 = -300;         // the helmet's rim hanging over Clawd, and at t = 0
+  const HOVER = SY - 14.4 * U, Y0 = -300;         // the helmet's rim hanging over Clawd, and at t = 0
   const GLOW = '#7FE3FF', WARM = '#FFB46E', RED = '#D8394E', DARK = '#16131B';
   const T_SNAP = 6.2, T_OFF = 19.0, T_BLACK = 33.4;
   const GLITCH = [[11.45, 11.8], [14.05, 14.55], [16.1, 17.1]];   // tear, lab ..., tear
@@ -78,6 +78,7 @@
     paint(dome, { wash: '#C4C3DA', ink: PAL.ink, sw });
     paint(ellPts(2.2 * u, -1.5 * u, 2.3 * u, 1.3 * u, 14, 0, -.5), { wash: '#A6A5C4', ink: null });
     paint(ellPts(-2.2 * u, -2.8 * u, 1.5 * u, .7 * u, 12, 0, -.45), { wash: '#EEEEF8', ink: null });
+    for (const s of [-1, 1]) paint(rrPts(s * 5.45 * u - .55 * u, -.4 * u, 1.1 * u, 2.3 * u, .45 * u), { wash: '#6E6C93', ink: PAL.ink, sw: sw * .8 });   // ear plates
     paint(rrPts(-5.6 * u, -.8 * u, 11.2 * u, 1.55 * u, .6 * u), { wash: '#5E5C86', ink: PAL.ink, sw: sw * .9 });
     for (let i = 0; i < 5; i++) paint(ellPts((-3.6 + i * 1.8) * u, 0, .38 * u, .38 * u, 10), { wash: mixCol('#3F4668', '#D2F8FF', clamp(leds[i])), ink: null });
     paint(rrPts(-.8 * u, -5.1 * u, 1.6 * u, .95 * u, .25 * u), { wash: '#5E5C86', ink: PAL.ink, sw: sw * .8 });
@@ -116,13 +117,12 @@
       const y = h.top + 100 + r * 235; if (y + 150 > GY - 90) break;
       for (let k = 0; k < n; k++) {
         const x = h.x0 + (k + .5) * cw;
-        if (hi === 1 && Math.abs(x - CX) < 100 && y > 1100) continue;   // the door
         WINS.push({ x, y, key: hi * 100 + r * 10 + k });
       }
     }
   });
   const PUDS = [[190, GY + 118, 110, 16], [735, GY + 150, 130, 18], [330, CURB + 150, 220, 34], [900, CURB + 270, 180, 30], [60, CURB + 430, 210, 34], [700, CURB + 520, 240, 40]];
-  const DOOR = [CX - 72, GY - 236, 144, 238];
+  const winPts = w => { boilSeed('win' + w.key); return rectPts(w.x - 55, w.y, 110, 150, 1.5); };
   const LAMP_X = 40;
 
   // the sky in painted bands (flat), dark at the top
@@ -141,7 +141,7 @@
     });
   }
   // flat layer: sky, house fronts, pavement, road, puddles
-  function streetFlat(P) {
+  function streetFlat(P, para) {
     const { x0, x1, y1 } = VIEW, m = 120, X = x0 - m, Wd = x1 - x0 + 2 * m;
     sky(P);
     HOUSES.forEach((h, i) => {
@@ -151,6 +151,14 @@
       flat(rectPts(h.x0, GY - 42, h.x1 - h.x0, 44), P.trim);
     });
     for (const [cx, top, w] of [[40, 560, 70], [1100, 610, 80]]) if (inView(cx, top - 120, cx + w, top)) flat(rectPts(cx, top - 110, w, 112), P.trim);
+    for (const w of WINS) {
+      if (!inView(w.x - 70, w.y, w.x + 70, w.y + 170)) continue;
+      const lit = !para && (w.key === 111 || w.key === 220 || w.key === 1);
+      flat(winPts(w), lit ? '#C9A873' : P.win);
+      boilSeed('sill' + w.key);
+      if (para) { flat(rectPts(w.x - 64, w.y + 142, 128, 22, 1), '#E27A92'); for (const k of [-1, 1]) flat(ellPts(w.x + k * 32, w.y + 136, 13, 11, 10), k < 0 ? '#FFF5E2' : '#F2C53D'); }
+      else flat(rectPts(w.x - 64, w.y + 150, 128, 12, 1), P.trim);
+    }
     if (y1 < GY - 10) return;
     flat(rectPts(X, GY, Wd, CURB - GY), P.walk);
     flat(rectPts(X, CURB, Wd, 22), P.kerb);
@@ -162,25 +170,13 @@
       flat(ellPts(px + 6, py - 2, rx * .9, ry * .72, 24), P.puddle);
     }
   }
-  // brush layer: windows, door, seams, paving, lamp
+  // brush layer: window outlines, paving, lamp
   function streetInk(P, t, para) {
     if (SKIP('ink')) return;
     for (const w of WINS) {
       if (!inView(w.x - 70, w.y, w.x + 70, w.y + 170)) continue;
-      boilSeed('win' + w.key);
-      const lit = !para && (w.key === 111 || w.key === 220 || w.key === 1);
-      paint(rectPts(w.x - 55, w.y, 110, 150, 1.5), { wash: lit ? '#C9A873' : P.win, ink: PAL.ink, sw: .8 });
+      paint(winPts(w), { ink: PAL.ink, sw: .8 });
       inkLine([[w.x, w.y + 4], [w.x, w.y + 146]], 1.1, P.frame, 'ink', 0);
-      if (para) {
-        paint(rectPts(w.x - 64, w.y + 142, 128, 22, 1), { wash: '#E27A92', ink: PAL.ink, sw: .6 });
-        for (const k of [-1, 1]) paint(ellPts(w.x + k * 32, w.y + 136, 13, 11, 10), { wash: k < 0 ? '#FFF5E2' : '#F2C53D', ink: null });
-      } else paint(rectPts(w.x - 64, w.y + 150, 128, 12, 1), { wash: P.trim, ink: null });
-    }
-    if (inView(...DOOR.slice(0, 2), DOOR[0] + DOOR[2], GY)) {
-      boilSeed('door');
-      paint(rrPts(...DOOR, 60, 1), { wash: P.door, ink: PAL.ink, sw: 1 });
-      if (para) paint(heartPts(CX, GY - 150, 26), { wash: '#FFF1C9', ink: null });
-      paint(ellPts(CX + 46, GY - 110, 7, 7, 8), { wash: para ? '#F2C53D' : '#9A94A0', ink: null });
     }
     if (VIEW.y1 > GY) {   // pavement joints and the kerb edge
       boilSeed('paving');
@@ -236,25 +232,25 @@
     const sx = 880, sy = 400; if (!inView(sx - 300, sy - 300, sx + 300, sy + 300)) return;
     glow(sx, sy, 330, '#FFE8A6', .85);
     boilSeed('sun');
-    paint(ellPts(sx, sy, 62, 62, 24, 1), { wash: '#FFF0B8', ink: null });
-    for (let i = 0; i < 10; i++) { const a = i / 10 * TAU + t * .25, r0 = 92, r1 = 140 + 14 * Math.sin(t * 3 + i); inkLine([[sx + Math.cos(a) * r0, sy + Math.sin(a) * r0], [sx + Math.cos(a) * r1, sy + Math.sin(a) * r1]], 2.4, '#FFE08A', 'dry', 0); }
+    flat(ellPts(sx, sy, 62, 62, 24, 1), '#FFF0B8');
+    for (let i = 0; i < 8; i++) { const a = i / 8 * TAU + t * .25, r0 = 92, r1 = 140 + 14 * Math.sin(t * 3 + i); inkLine([[sx + Math.cos(a) * r0, sy + Math.sin(a) * r0], [sx + Math.cos(a) * r1, sy + Math.sin(a) * r1]], 2.6, '#FFE08A', 'ink', 0); }
   }
   const BUNT = [[-300, 880, 1400, 930, 120], [-300, 1110, 1400, 1070, 80]];
   function bunting(t) {
     if (SKIP('bunt')) return;
+    flushBrush();   // the flags are flat and must sit over the window outlines
     BUNT.forEach(([x0, y0, x1, y1, sag], s) => {
       if (!inView(x0, Math.min(y0, y1), x1, Math.max(y0, y1) + sag + 70)) return;
       const at = k => [lerp(x0, x1, k), lerp(y0, y1, k) + sag * 4 * k * (1 - k) + 5 * Math.sin(t * 2 + k * 9 + s)];
-      const P = []; for (let k = 0; k <= 16; k++) P.push(at(k / 16));
-      boilSeed('bunt' + s);
-      inkLine(P, 1, PAL.ink, 'ink', .5);
       const n = 20;
       for (let i = 0; i < n; i++) {
         const a = at((i + .12) / n), b = at((i + .88) / n); if (!inView(a[0], a[1], b[0], b[1] + 60)) continue;
         const mid = [(a[0] + b[0]) / 2 + 5 * Math.sin(t * 3 + i), (a[1] + b[1]) / 2 + 56];
-        boilSeed('flag' + s + i);
-        paint([a, b, mid], { wash: CONF[(i + s * 3) % 5], ink: PAL.ink, sw: .6 });
+        flat([a, b, mid], CONF[(i + s * 3) % 5]);
       }
+      const P = []; for (let k = 0; k <= 16; k++) P.push(at(k / 16));
+      boilSeed('bunt' + s);
+      inkLine(P, 1.2, PAL.ink, 'ink', .5);
     });
   }
   // the red carpet from Clawd's feet down the road
@@ -263,7 +259,7 @@
     if (SKIP('pools')) return;
     PUDS.forEach(([px, py, rx, ry], i) => {
       if (!inView(px - rx, py - ry, px + rx, py + ry)) return;
-      for (let k = 0; k < 2; k++) { const ph = frac(t * .8 + hash(i * 5 + k)); boilSeed('pool' + i + k); sparkle(px + (hash(i * 7 + k) - .5) * rx, py + (hash(i + k * 3) - .5) * ry, 16, ph); }
+      for (let k = 0; k < 1; k++) { const ph = frac(t * .8 + hash(i * 5 + k)); boilSeed('pool' + i + k); sparkle(px + (hash(i * 7 + k) - .5) * rx, py + (hash(i + k * 3) - .5) * ry, 16, ph); }
     });
   }
   // confetti: world-anchored cells like the rain, but slow and fluttering; plus the burst at the snap
@@ -277,29 +273,55 @@
       const x = (i + hash(i * 13.7 + j * 5.1)) * cs + 26 * Math.sin(t * 2.2 + i * 1.7 + j), y = (j + frac(hash(i * 3.3 + j * 17.9) + t * .5)) * cs;
       if (y > SY + 900 || y > VIEW.y0 + fall * (VIEW.y1 - VIEW.y0 + 200)) continue;
       const a = t * (2.5 + 3 * hash(i + j * 7)) + i, s = 9 + 6 * hash(i * 7 + j), fl = Math.abs(Math.cos(t * 5 + i + j));
-      boilSeed('conf' + n++);
-      paint([[-s, -s * .5 * fl], [s, -s * .5 * fl], [s, s * .5 * fl], [-s, s * .5 * fl]].map(p => { const r = rot2(p, a); return [x + r[0], y + r[1]]; }), { wash: CONF[Math.floor(hash(i * 3 + j * 11) * 6)], ink: null });
+      n++;
+      flat([[-s, -s * .5 * fl], [s, -s * .5 * fl], [s, s * .5 * fl], [-s, s * .5 * fl]].map(p => { const r = rot2(p, a); return [x + r[0], y + r[1]]; }), CONF[Math.floor(hash(i * 3 + j * 11) * 6)]);
     }
     const age = t - T_SNAP;
     if (age > 0 && age < 1.4) for (let k = 0; k < 22; k++) {   // the burst from the crown
       const ang = -Math.PI / 2 + (hash(k + 50) - .5) * 2.8, v = 650 + 500 * hash(k + 60), x = CX + Math.cos(ang) * v * age, y = SY - 10 * U + Math.sin(ang) * v * age + 700 * age * age;
       const s = 11 + 5 * hash(k), a = age * 9 + k;
-      boilSeed('burst' + k);
-      paint([[-s, -s * .45], [s, -s * .45], [s, s * .45], [-s, s * .45]].map(p => { const r = rot2(p, a); return [x + r[0], y + r[1]]; }), { wash: CONF[k % 6], ink: null });
+      flat([[-s, -s * .45], [s, -s * .45], [s, s * .45], [-s, s * .45]].map(p => { const r = rot2(p, a); return [x + r[0], y + r[1]]; }), CONF[k % 6]);
     }
   }
-  // the crowd: [x, y, u, colour, view, flip, phase, emote]
-  const CROWD_BACK = [[95, GY + 10, 13, '#E27A92', 'front', false, .1, 'hearts'], [225, GY + 4, 12, '#7FA6DE', 'front', false, .55, null],
-                      [862, GY + 4, 12, '#8FC66A', 'front', false, .8, null], [992, GY + 10, 13, '#B58AD8', 'front', false, .3, 'hearts']];
-  const CROWD_FRONT = [[150, SY + 370, 32, '#F0BE46', 'qback', false, .35, null], [945, SY + 395, 34, '#6FC0B8', 'qback', true, .7, null]];
+  // The crowd, painted cheaply: flat body, legs and arms, one outline, and (from the front) happy eyes and a grin.
+  // It's the same Clawd model; only the main characters need the full watercolour clawd().
+  function miniClawd(x, y, u, col, o) {
+    const f = o.flip ? -1 : 1, sx = 1 + o.sq * .6, sy = 1 - o.sq, dk = mixCol(col, PAL.ink, .3);
+    const W2 = P => P.map(([a, c]) => [x + f * a * u * sx, y + o.dy * u + c * u * sy]);
+    boilSeed(o.key);
+    const legs = o.back ? [[3.3, 1], [.8, 0], [-1.8, 0], [-4.3, 0]] : [[-4, 0], [-2, 0], [1, 0], [3, 0]];
+    for (const [lx, far] of legs) flat(W2(rectPts(lx, -2.4, 1, 2.2, .05)), far ? mixCol(dk, PAL.ink, .2) : dk);
+    for (const [px, dir, a] of [[-4.9, -1, o.aL], [4.9, 1, o.aR]]) {
+      const root = px + dir * .55 * clamp((Math.abs(a) - .7) / .9), r = dir < 0 ? a : -a;
+      flat(W2([[0, -.5], [2.2 * dir, -.5], [2.2 * dir, .5], [0, .5]].map(q => { const v = rot2(q, r); return [root + v[0], -4.5 + v[1]]; })), col);
+    }
+    const body = W2(rectPts(-5.05, -8, 10.1, 6, .06));
+    flat(body, col);
+    flat(W2(rectPts(-4.8, -3.8, 9.6, 1.6, .04)), mixCol(col, dk, .35));
+    if (o.back) flat(W2(rectPts(2.3, -8, 2.7, 6, .04)), mixCol(col, dk, .45));
+    else {
+      for (const s of [-1, 1]) flat(W2(ellPts(s * 3.6, -4.6, .85, .42, 10)), mixCol(col, PAL.rose, .6));
+      flat(W2([[-1.3, -4.8], [1.3, -4.8], [.9, -3.9], [-.9, -3.9]]), '#4A1F2A');
+    }
+    paint(body, { ink: PAL.ink, sw: clamp(u / 15, .6, 2) });
+    if (!o.back) for (const s of [-1, 1]) inkLine(W2([[s * 2.5 - .9, -5.3], [s * 2.5, -6.5], [s * 2.5 + .9, -5.3]]), clamp(u / 15, .6, 2) * 1.3, PAL.ink, 'ink', .2);
+    if (o.hearts) for (let i = 0; i < 2; i++) {   // hearts rising
+      const ph = frac(o.t * .55 + i / 2), a = Math.sin(ph * Math.PI); if (a < .15) continue;
+      flat(W2(heartPts(4.5 + Math.sin(ph * 6 + i * 2) * .7, -9 - ph * 4, .45 + .5 * a, 16)), '#E2476E');
+    }
+  }
+  // [x, y, u, colour, flip, phase, hearts, back]
+  const CROWD_BACK = [[95, GY + 10, 13, '#E27A92', false, .1, true, false], [225, GY + 4, 12, '#7FA6DE', false, .55, false, false],
+                      [862, GY + 4, 12, '#8FC66A', false, .8, false, false], [992, GY + 10, 13, '#B58AD8', false, .3, true, false]];
+  const CROWD_FRONT = [[150, SY + 370, 30, '#F0BE46', false, .35, false, true], [945, SY + 395, 32, '#6FC0B8', true, .7, false, true]];
+  // cheering: arms up, alternating, hopping on the beat; clockwork = all in step (after the second glitch)
   function crowd(t, list, key, clockwork) {
     if (SKIP(key)) return;
-    list.forEach(([x, y, u, col, view, flip, ph, em], i) => {
-      if (!inView(x - 7 * u, y - 13 * u, x + 7 * u, y + u)) return;
-      const b = bpOf(t) + (clockwork ? 0 : ph), s = Math.sin(b * TAU * (clockwork ? 1 : 1)), up = Math.abs(Math.sin(b * Math.PI));
-      clawd(x, y, u, { view, flip, eyes: 'happy', mouth: 'grin', blush: .4, col, dk: mixCol(col, PAL.ink, .3), lt: mixCol(col, '#FFFFFF', .45),
-        aL: 1.2 + .38 * s, aR: 1.2 - .38 * s, dy: -1.1 * up, sq: .1 * pulse(t + (clockwork ? 0 : ph) * BEAT), noShadow: true,
-        boilKey: key + i, emote: em, emoteK: 1, emoteAge: t + ph * 3 });
+    list.forEach(([x, y, u, col, flip, ph, hearts, back], i) => {
+      if (!inView(x - 8 * u, y - 13 * u, x + 8 * u, y + u)) return;
+      const b = bpOf(t) + (clockwork ? 0 : ph), s = Math.sin(b * TAU);
+      miniClawd(x, y, u, col, { flip, back, hearts, t: t + ph * 3, key: key + i, aL: 1.2 + .38 * s, aR: 1.2 - .38 * s,
+        dy: -1.1 * Math.abs(Math.sin(b * Math.PI)), sq: .1 * pulse(t + (clockwork ? 0 : ph) * BEAT) });
     });
   }
   // the cake grows out of the ground behind Clawd
@@ -311,17 +333,23 @@
     const g = t < CAKE_T[0] ? 0 : backOut(seg(t, ...CAKE_T)); if (g < .02) return;
     const w = .05 * spring(t, CAKE_T[1], 5, 14);
     push(); translate(CX, CAKE_BASE); scale(1 + w, g); translate(-CX, -CAKE_BASE);
+    flushBrush();   // flat tiers over the crowd and flags behind
     let y = CAKE_BASE;
+    const outlines = [];
     TIERS.forEach(([wd, h, c, ic], i) => {
       boilSeed('tier' + i);
-      paint(rectPts(CX - wd / 2, y - h, wd, h, 2), { wash: c, ink: PAL.ink, sw: 1.2 });
+      const T = rectPts(CX - wd / 2, y - h, wd, h, 2);
+      flat(T, c);
       const P = [[CX - wd / 2 - 8, y - h - 8], [CX + wd / 2 + 8, y - h - 8]];
       for (let k = 12; k >= 0; k--) P.push([CX - wd / 2 - 8 + k * (wd + 16) / 12, y - h + 22 + (k % 2 ? 22 + 18 * hash(k + i * 7) : 2)]);
-      paint(P, { wash: ic, ink: PAL.ink, sw: .9, curv: .35 });
-      for (let k = 0; k < 4; k++) paint(ellPts(CX - wd / 2 + (k + .5) * wd / 4, y - h * .35, 13, 13, 10), { wash: RED, ink: PAL.ink, sw: .6 });
+      const Ps = through(P.concat([P[0]]), 3);
+      flat(Ps, ic);
+      for (let k = 0; k < 4; k++) flat(ellPts(CX - wd / 2 + (k + .5) * wd / 4, y - h * .35, 13, 13, 10), RED);
+      outlines.push(T, Ps);
       y -= h;
     });
-    for (const dx of [-80, 0, 80]) { boilSeed('candle' + dx); paint(rectPts(CX + dx - 11, y - 96, 22, 96, 1), { wash: dx ? '#7FB8E6' : '#F2C53D', ink: PAL.ink, sw: .8 }); }
+    for (const dx of [-80, 0, 80]) { boilSeed('candle' + dx); const C = rectPts(CX + dx - 11, y - 96, 22, 96, 1); flat(C, dx ? '#7FB8E6' : '#F2C53D'); outlines.push(C); }
+    outlines.forEach((O, i) => { boilSeed('cakeink' + i); paint(O, { ink: PAL.ink, sw: 1.1 }); });
     pop();
     if (g > .9) {
       const fy = CAKE_BASE + (CAKE_TOP - 96 - CAKE_BASE) * g;
@@ -342,7 +370,7 @@
     paint(ellPts(50, -44, 13, 13, 10), { wash: RED, ink: PAL.ink, sw: .6 });
     pop();
   }
-  const SLICE_T = [12.15, 12.7], CHOMPS = [13.0, 13.35, 13.72, 14.0];
+  const SLICE_T = [11.95, 12.7], CHOMPS = [13.0, 13.35, 13.72, 14.0];
   function lidAt(t) {
     let l = kf(t, [[12.05, 0], [12.35, .95], [12.62, .95], [12.7, 0]], easeOut);
     for (const c of CHOMPS) l += .38 * Math.sin(Math.PI * seg(t, c - .14, c + .1));
@@ -395,7 +423,7 @@
   const MOOD = [
     [0, 'sad', { emote: null }], [2.35, 'surprised', { lookY: -1 }], [3.0, 'hopeful', { lookY: -1 }], [4.45, 'determined', { lookY: -1 }],
     [5.4, 'relieved', { emote: null }], [6.4, 'starstruck'], [7.8, 'excited'], [9.75, 'love', { lookY: -1 }], [10.7, 'laugh'],
-    [12.1, 'excited', { emote: null }], [12.75, 'happy', { emote: null, eyes: 'squeeze' }], [14.65, 'confused'], [15.35, 'nervous'],
+    [11.95, 'neutral', { eyes: 'wide', mouth: 'O', lookX: .9, lookY: -.3, emote: null }], [12.75, 'happy', { emote: null, eyes: 'squeeze' }], [14.65, 'confused'], [15.35, 'nervous'],
     [17.15, 'scared'], [17.65, 'determined'], [19.05, 'surprised', { emote: 'sweat' }], [19.6, 'sad', { emote: null }],
     [24.65, 'surprised', { lookY: -1, emote: null }], [25.7, 'relieved', { emote: null, lookX: .8 }], [26.4, 'happy', { lookX: .7 }],
     [27.6, 'hopeful', { lookX: -1 }], [29.0, 'neutral', { eyes: 'look', seed: 1.96 }], [32.95, 'determined', { emote: null }],
@@ -411,7 +439,7 @@
       if (t > 3.95 && t < 4.45) { p.lookX = kf(t, [[3.95, 0], [4.05, -.9], [4.3, -.9], [4.42, 0]]); p.lookY = kf(t, [[3.95, -1], [4.05, .4], [4.3, .4], [4.42, -1]]); }
       helm = 'cable';
     } else if (t < T_SNAP) {
-      const j = jump(t, 4.75, 5.35, 3.2);
+      const j = jump(t, 4.75, 5.35, 6.7);
       p.dy = j.dy; p.sq = j.sq;
       p.aL = kf(t, [[4.55, .5], [4.72, -.3], [4.85, 1.45], [5.35, 1.35], [5.7, 1.1], [6.2, .9]]);
       p.aR = kf(t, [[4.55, .5], [4.74, -.35], [4.87, 1.4], [5.37, 1.3], [5.75, 1.05], [6.2, .85]]);
@@ -514,7 +542,7 @@
   // ---------- the worlds ----------
   function rainWorld(t, o = {}) {
     const P = PALS.rain;
-    streetFlat(P);
+    streetFlat(P, false);
     streetInk(P, t, false);
     if (inView(LAMP_X, 880, LAMP_X + 120, 980)) glow(LAMP_X + 80, 935, 120, '#E8C98A', .35);
     const c = clawdAt(t), f = friendAt(t), um = umbAt(t, f), hp = helmPos(t, c);
@@ -549,7 +577,7 @@
   }
   function paradise(t) {
     const P = PALS.para, clock = t > 15.3;
-    streetFlat(P);
+    streetFlat(P, true);
     carpet();
     sun(t);
     streetInk(P, t, true);
@@ -560,8 +588,8 @@
     const c = clawdAt(t), hp = helmPos(t, c);
     // the slice flies in from the crowd, into the open lunchbox
     if (t > SLICE_T[0] && t < SLICE_T[1]) {
-      const k = seg(t, ...SLICE_T), [x, y] = arcPt([1180, SY - 520], [CX + 60, SY - 5.4 * U], 240, easeIn(k) * .35 + k * .65);
-      slice(x, y, -1.2 + k * 1.3, .9);
+      const k = seg(t, ...SLICE_T), [x, y] = arcPt([930, SY - 470], [CX + 60, SY - 5.4 * U], 200, easeIn(k) * .4 + k * .6);
+      slice(x, y, -1.6 + k * 1.6, 1.25);
     }
     boilSeed('shadowMe');
     clawd(c.x, c.y, U, { ...c.o, boilKey: 'me', draw: hp && hp.onHead ? helmetHook(c.o, ledsAt(t)) : undefined });
@@ -574,6 +602,7 @@
         paint(ellPts(x, y, 7, 6, 8), { wash: i % 3 ? '#F4BCCB' : '#FFF5E2', ink: PAL.ink, sw: .4 });
       }
     }
+    flushBrush();   // the front row and the confetti are flat and sit over everything
     crowd(t, CROWD_FRONT, 'cf', clock);
     confetti(t);
   }
