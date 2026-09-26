@@ -198,7 +198,6 @@
     if (t >= 10.7 && t < COLLAPSE) return { P: SPC, kind: 'sp', f: ease(seg(t, 10.7, 11.4)) };
     return null;
   }
-  const reveal = (M, y0, y1) => M.f >= 1 ? 1 : seg(BTOP + BH * M.f, y0, y1);
   // the atom flares: twice in the x-ray, and at random in the "both" view
   const flare = t => [8.25, 8.95, 9.4].reduce((a, t0, i) => Math.max(a, t > t0 - .05 ? (i === 2 ? .45 : 1) * Math.exp(-Math.max(0, t - t0) * 7) * seg(t, t0 - .05, t0) : 0), 0) + (t > 10.7 && hash(Math.floor(t * 12) * 1.3) > .8 ? .5 : 0);
 
@@ -216,7 +215,7 @@
     const m = emotions(t, MOOD), p = {};
     if (t > 4.3 && t < 10.8) p.dx = .3 * ease(seg(t, 4.3, 4.8)) * (1 - ease(seg(t, 4.9, 5.3)));
     if (t > 17.95) { const k = seg(t, 18.0, 18.5); p.dx = STEP * ease(k); if (k > 0 && k < 1) { p.walk = STEP * ease(k) / 4 * 1.6; p.view = 'q'; } }
-    if (t >= 14.5 && t < 16.25) { p.lookY = -1; p.lookX = swapN(t) % 2 ? .75 : -.45; }
+    if (t >= 14.5 && t < 16.25) { p.lookY = -1; p.lookX = swapN(t) % 2 ? .75 : -.45; if (t < 15.55) p.emote = null; }
     if (t > REACH[0] && t < REACH[1]) {
       p.aR = kf(t, [[REACH[0], m.aR ?? .2], [19.2, .92], [19.8, .98], [19.95, 1.6], [REACH[1], m.aR ?? 1.1]]) + (t > 19.2 && t < 19.8 ? .03 * Math.sin(t * 60) : 0);
       const lean = ease(seg(t, 18.45, 19.1)) * (1 - ease(seg(t, 20.0, 20.3)));
@@ -237,18 +236,18 @@
   function catAt(t, co) {
     if (t < SLAMS[0]) {
       const duck = easeIn(seg(t, .7, .9)), up = t > .42;
-      return { x: CATX, y: lerp(PEEKY, SITY + 40, duck), where: 'in', peek: duck < .35,
+      return { x: CATX, y: lerp(PEEKY, SITY, duck), where: 'in', peek: duck < .35,
         o: { pose: 'sit', eyes: up ? 'wide' : 'open', lookY: up ? -1 : 0, ear: 1 - .7 * duck, mouth: up ? 'open' : 'w' } };
     }
     if (t < COLLAPSE) return null;
     if (t < LEAP1[0]) {   // pops up, alive; looks at Clawd; crouches
       const rise = backOut(seg(t, 19.95, 20.3)), cr = ease(seg(t, LEAP1[0] - .3, LEAP1[0]));
-      return { x: CATX, y: lerp(SITY + 30, PEEKY, rise) + 14 * cr, where: 'in', peek: rise > .6,
+      return { x: CATX, y: lerp(SITY, PEEKY, rise) + 14 * cr, where: 'in', peek: rise > .6,
         o: { pose: 'sit', flip: t > 20.95, eyes: t < 20.55 ? 'happy' : 'open', lookX: t < 20.95 ? 0 : -1, mouth: t < 20.55 ? 'open' : 'w', sq: .22 * cr - .08 * spring(t, 20.3, 6, 18), ear: 1 - .4 * cr } };
     }
     const top = headTop(co);
     if (t < LEAP1[1]) {
-      const k = seg(t, ...LEAP1), p0 = [CATX, PEEKY - 1.6 * S], p1 = [top[0] + 4, top[1] - .72 * S], h = 260;
+      const k = seg(t, ...LEAP1), p0 = [CATX, PEEKY - 1.6 * S], p1 = [top[0] + 4, top[1] - .72 * S], h = 175;
       const [x, y] = arcPt(p0, p1, h, k);
       return { x, y, where: k < .12 ? 'in' : 'out', o: { pose: 'leap', flip: true, rot: leapRot(p0, p1, h, k, true), sx: 1 + .12 * Math.sin(Math.PI * k), eyes: 'wide', ear: .6 } };
     }
@@ -259,14 +258,14 @@
         o: { pose: 'loaf', flip: !turned, rot: top[2], sq: .25 * Math.exp(-land * 7) * Math.cos(land * 18) + .2 * cr, eyes, lookX: t > 25.2 ? 1 : 0, blush: t > 23.1 && t < 25.2 ? .8 : 0, ear: t < 25.2 ? .75 : 1, wag: t * 1.5 } };
     }
     if (t < LEAP2[1]) {
-      const k = seg(t, ...LEAP2), p0 = [top[0], top[1] - .72 * S], p1 = [CATX, GY - 40], h = 230;
+      const k = seg(t, ...LEAP2), p0 = [top[0], top[1] - .72 * S], p1 = [CATX, GY - 40], h = 190;
       const [x, y] = arcPt(p0, p1, h, k);
       return { x, y, where: k > .72 ? 'in' : 'out', o: { pose: 'leap', rot: leapRot(p0, p1, h, k, false), sx: 1 + .12 * Math.sin(Math.PI * k), eyes: 'happy', ear: .7 } };
     }
     if (t < 27.05) return null;
     if (t < SLAMS[1]) {
       const rise = backOut(seg(t, 27.05, 27.4)), duck = easeIn(seg(t, 28.5, 28.7)), wink = t > 27.7 && t < 28.15, up = t > 28.2;
-      return { x: CATX, y: lerp(SITY + 30, PEEKY, rise) + lerp(0, SITY + 40 - PEEKY, duck), where: 'in', peek: rise > .6 && duck < .35,
+      return { x: CATX, y: lerp(SITY, PEEKY, rise) + lerp(0, SITY - PEEKY, duck), where: 'in', peek: rise > .6 && duck < .35,
         o: { pose: 'sit', eyes: wink ? 'wink' : up ? 'wide' : 'open', mouth: wink ? 'tongue' : up ? 'open' : 'w', lookY: up ? -1 : 0, ear: 1 - .7 * duck } };
     }
     return null;
@@ -400,7 +399,7 @@
     if (k <= .02) return;
     const [bx, by] = BUB;
     if (after > 0) { if (after < .5) for (let i = 0; i < 8; i++) { const ang = i * TAU / 8; boilSeed('bp' + i); sparkle(bx + Math.cos(ang) * 240 * easeOut(after / .5), by + Math.sin(ang) * 180 * easeOut(after / .5), 26, after / .5); } return; }
-    const spin = easeIn(seg(t, 16.05, BUBT[1]));
+    const spin = ease(seg(t, 16.05, BUBT[1]));
     boilSeed('puffs');
     paint(ellPts(CX + 5, 1200, 12 * k, 10 * k, 12), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
     paint(ellPts(CX - 12, 1163, 19 * k, 16 * k, 14), { wash: '#EEE7F6', ink: PAL.ink, sw: .8 });
@@ -409,13 +408,13 @@
     const C = []; for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, r = 1 + .09 * Math.abs(Math.sin(a * 3.5)); C.push([Math.cos(a) * 262 * r, Math.sin(a) * 200 * r]); }
     paint(C, { wash: '#EEE7F6', ink: PAL.ink, sw: 1.1 });
     const which = swapN(t) % 2;
-    if (spin < .35) {
-      if (!which) cat(-45, 118, 32, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1 + .6 * Math.sin(t * 11), wag: t * 8, key: 'ba' });
-      else cat(20, 82, 30, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, key: 'bg' });
+    if (spin < .22) {
+      if (!which) cat(-50, 135, 40, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1 + .6 * Math.sin(t * 11), wag: t * 8, key: 'ba' });
+      else cat(15, 95, 36, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, key: 'bg' });
     } else {
       rotate(spin * TAU * 1.5);
-      cat(-40, 105, 26, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1.2, op: 200, key: 'ba' });
-      cat(25, 70, 24, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, op: 200, key: 'bg' });
+      cat(-50, 135, 34, { pose: 'sit', eyes: 'wink', mouth: 'tongue', paw: 1.2, op: 200, key: 'ba' });
+      cat(15, 95, 30, { pose: 'ghost', cols: GHOST, eyes: 'closed', halo: 1, op: 200, key: 'bg' });
       const sp = []; for (let i = 0; i < 26; i++) { const a = i * .55, r = 6 + i * 5.5; sp.push([Math.cos(a) * r, Math.sin(a) * r * .8]); }
       boilSeed('swirl'); inkLine(sp, 2.4 * spin, PAL.violet, 'ink', .6);
     }
@@ -439,9 +438,11 @@
     if (M && M.f > 0) {
       panel(t, M);
       const bg = M.P.panel;
-      apparatus(t, M, reveal(M, BTOP + 60, GY - 20) * (M.kind === 'sp' ? .6 : 1), flare(t));
-      const ca = reveal(M, BTOP + 50, GY - 10);
-      if (M.kind === 'xr') cat(CATX, SITY, S, { pose: 'sit', cols: catCols('xr', ca, bg), eyes: 'open', wag: t * 2.5, seed: 1.3, key: 'xrcat' });
+      // the contents fade in once the sweep has uncovered the whole front, and out before it sweeps back
+      const ca = M.kind === 'xr' ? seg(t, 5.75, 6.05) * (1 - seg(t, 9.72, 9.92)) : seg(t, 11.35, 11.7);
+      apparatus(t, M, ca * (M.kind === 'sp' ? .6 : 1), flare(t));
+      if (ca < .02) {}
+      else if (M.kind === 'xr') cat(CATX, SITY, S, { pose: 'sit', cols: catCols('xr', ca, bg), eyes: 'open', wag: t * 2.5, seed: 1.3, key: 'xrcat' });
       else {
         const hop = Math.abs(Math.sin(bpOf(t) * Math.PI)), alt = t > 17.9 ? .5 + .5 * Math.sin(t * 7) : 1;
         cat(CATX, SITY - 18 * hop, S, { pose: 'sit', cols: catCols('normal', ca * (.45 + .25 * alt), bg), op: 150, eyes: 'wink', mouth: 'tongue', paw: 1 + .7 * Math.sin(t * 9), wag: t * 7, sq: .08 * pulse(t), key: 'spcat' });
@@ -481,7 +482,7 @@
       glow(BX, BTOP - 30, 700 * (1 - ca / .7 * .5), '#FFE2A0', 1 - ca / .7);
     }
     // the last "both": a pale halo drifts up out of the shut lid
-    if (t > 29.5) { const k = seg(t, 29.5, 31.2), hx = CATX + HEAD[0] * S, hy = BTOP - 60 - 170 * ease(k), al = Math.sin(Math.PI * clamp(k * 1.2)) * .8; if (al > .02) { glow(hx, hy, 90, '#FFE08A', .5 * al); boilSeed('lasthalo'); paint(ellPts(hx, hy, .9 * S, .27 * S, 24), { ink: mixCol(WALL[2], HALO, al), sw: 1.5 }); } }
+    if (t > 29.5) { const k = seg(t, 29.5, 31.2), hx = CATX + HEAD[0] * S, hy = BTOP - 60 - 170 * ease(k), al = Math.sin(Math.PI * clamp(k * 1.2)) * .8; if (al > .02) { glow(hx, hy, 120, '#FFE08A', .85 * al); boilSeed('lasthalo'); paint(ellPts(hx, hy, .9 * S, .27 * S, 24), { ink: mixCol(WALL[2], '#FFE49A', al), sw: 1.3 }); } }
     bubble(t);
     camEnd();
     if (ca > 0 && ca < .3) { flushBrush(); flat([[-60, -60], [W + 60, -60], [W + 60, H + 60], [-60, H + 60]], '#FFF3D6', null, .5 * (1 - ca / .3)); }
@@ -501,8 +502,8 @@
   // A 0–4.8: the peek, the slam; pull back to Clawd; the thump; curiosity
   function shotA(t) {
     let c;
-    if (t < 2.2) c = [CLOSE[0], CLOSE[1], CLOSE[2] + .05 * t];
-    else if (t < 3.15) c = mixCam([CLOSE[0], CLOSE[1], CLOSE[2] + .11], TWO, ease(seg(t, 2.2, 3.15)));
+    if (t < 1.9) c = [CLOSE[0], CLOSE[1], CLOSE[2] + .05 * t];
+    else if (t < 3.15) c = mixCam([CLOSE[0], CLOSE[1], CLOSE[2] + .095], TWO, ease(seg(t, 1.9, 2.95)));
     else c = mixCam(TWO, [545, 1345, 1.35], ease(seg(t, 3.7, 4.8)));
     c = shake(c, t);
     frame(t, c, t < .4 ? { iris: [...scr(faceAt(t), c), lerp(0, 1300, easeIn(t / .4))] } : {});
