@@ -13,9 +13,9 @@
   const SURF = GY - 83;                                        // desk top inside = ledge top outside = the slot's floor
   const DESK_X0 = 400, DESK_X1 = 660, LEDGE_X0 = 190;
   const CW = 96, CH = 66, REST_Y = SURF - CH / 2;              // a card, and where it rests on the desk or the ledge
-  const CX_D = 735, CX_B = 1010, VX = 150;                     // Clawd at the desk and at the book; the visitor
+  const CX_D = 735, CX_B = 930, VX = 150;                     // Clawd at the desk and at the book; the visitor
   const ARRIVE = 600, PAINT_X = 600, LEDGE_X = 250;
-  const BOOK = { cx: 1010, top: GY - 650, bot: GY - 190, pw: 250 }, ROWS = [95, 230, 365];
+  const BOOK = { cx: 930, top: GY - 650, bot: GY - 190, pw: 250 }, ROWS = [95, 230, 365];
   const LAMP = { x: 690, y: 880 };
   const MON = { x0: 560, x1: 1140, y0: -452, y1: -20, sx0: 602, sx1: 1098, sy0: -414, sy1: -58 };
   const SOCKET = [1462, GY - 150];
@@ -24,7 +24,7 @@
     wallIn: '#4B3A4B', cubby: '#35293B', wood: '#8C5F3E', woodDk: '#5E3F2C', card: '#F4E8CC', cardDk: '#D9C8A2',
     section: '#3B3040', shell: '#DCCFB2', floorIn: '#6F503C', desk: '#9C6C47', deskDk: '#7A5234', hole: '#1C1620',
     cover: '#7C2F3B', page: '#F7EDD6', pageDk: '#E6D5B2', rule: '#DCCBA6', arrow: '#8A7A66',
-    wallOut: '#BFD6E1', wainOut: '#A7C3D1', floorOut: '#8FA5B1', frame: '#F3EBDC', sky: '#8EC3E6',
+    wallOut: '#BFD6E1', wainOut: '#A7C3D1', floorOut: '#A08C76', frame: '#F3EBDC', sky: '#8EC3E6',
     case: '#E4D8BC', caseDk: '#C8B892', screen: '#1D3E47', bubQ: '#BFE3F2', bubA: '#F6BC9E',
     gQ: '#2F3C7A', gA: '#C23B32', brass: '#C9A45A', cable: '#3E3A44', led: '#7EE08A',
     vis: '#6FA8C7', visDk: '#3F7699', visLt: '#AFD7EA', gold: '#F0C75A',
@@ -386,6 +386,7 @@
     if (y1 > GY) flat(box(X, GY, Wd, y1 + m - GY), COL.floorOut);
     edge([X, GY - 280], [X + Wd, GY - 280], 1.1, '#7F9FAF', 'rail');
     edge([X, GY], [X + Wd, GY], 1.2, PAL.ink, 'floor');
+    for (let j = 1; j < 8; j++) { const y = GY + j * j * 14; if (y > y1 + 20) break; edge([X, y], [X + Wd, y], .6, '#85705C', 'plank' + j, 'inkfine'); }
     // the window, with sky: outside has daylight, inside has none
     if (vis(-10, GY - 780, 260, GY - 400)) {
       boilSeed('window');
@@ -635,11 +636,11 @@
   function thought(t) {
     const k = backOut(seg(t, 14.3, 14.62)) * (1 - ease(seg(t, 19.2, 19.5)));
     if (k <= .02 || t > 19.5) return;
-    const bx = VX + 180, by = GY - 405;
+    const bx = VX + 45, by = GY - 410;
     if (!vis(bx - 200, by - 160, bx + 200, by + 220)) return;
-    for (const [dx, dy, r] of [[-126, 205, 12], [-100, 158, 19]]) { boilSeed('tb' + r); paint(ellPts(bx + dx * k, by + dy * k, r * k, r * k, 12), { wash: '#FFFDF6', ink: PAL.ink, sw: .8 }); }
+    for (const [dx, dy, r] of [[-10, 215, 12], [10, 165, 19]]) { boilSeed('tb' + r); paint(ellPts(bx + dx * k, by + dy * k, r * k, r * k, 12), { wash: '#FFFDF6', ink: PAL.ink, sw: .8 }); }
     push(); translate(bx, by); scale(k);
-    const P = []; for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, bump = 1 + .1 * Math.abs(Math.sin(a * 4.5)); P.push([Math.cos(a) * 152 * bump, Math.sin(a) * 120 * bump]); }
+    const P = []; for (let i = 0; i < 44; i++) { const a = i / 44 * TAU, bump = 1 + .1 * Math.abs(Math.sin(a * 4.5)); P.push([Math.cos(a) * 140 * bump, Math.sin(a) * 112 * bump]); }
     boilSeed('tbub'); paint(P, { wash: '#FFFDF6', ink: PAL.ink, sw: 1.1 });
     glow(0, 20, 150, '#FFE08A', .5);
     clawd(0, 78, 10, { col: COL.gold, dk: '#C9962E', lt: '#FFF0B8', eyes: 'shine', mouth: 'smile', hat: 'wizard', aL: 1.25 + .15 * Math.sin(t * 5), aR: -.5, noShadow: true, boilKey: 'genius', emote: 'bulb', emoteK: 1, emoteAge: t, sq: .04 * Math.sin(t * 6) });
@@ -690,13 +691,13 @@
   }
 
   // ---------- shots ----------
-  const TWO = [445, GY - 205, 1.15], WIDE = [772, 575, .74], SCREEN = [850, -238, 1.8], VIS1 = [245, GY - 170, 2.05];
+  const TWO = [405, GY - 270, 1.25], WIDE = [772, 575, .74], SCREEN = [850, -238, 1.8], VIS1 = [245, GY - 170, 2.05];
   // A 0–3.44: the hook: a card slides in through the slot; Clawd wakes; pull back on the room
   function shotA(t, lt) {
     let c;
     if (t < 1.25) c = [lerp(392, 598, ease(seg(t, .05, 1.3))), SY + 6, lerp(3.4, 2.9, ease(seg(t, 0, 1.25)))];
     else if (t < 2.05) c = mixCam([594, SY + 6, 2.92], [655, GY - 150, 2.05], ease(seg(t, 1.25, 1.8)));
-    else c = mixCam([655, GY - 150, 2.05], [850, 830, 1.27], ease(seg(t, 2.05, 3.35)));
+    else c = mixCam([655, GY - 150, 2.05], [850, 1150, 1.1], ease(seg(t, 2.05, 3.35)));
     frame(t, c);
     if (lt < .45) { const [sx, sy] = scr([(WL0 + WL1) / 2, SY], c); slotIris(sx, sy, lerp(0, 1500, easeIn(lt / .45))); }
   }
@@ -705,15 +706,15 @@
     const Cp = clawdAt(t);
     let c;
     if (t < 4.3) c = [Cp.x + 40, GY - 250, 1.6];
-    else if (t < 5.95) c = mixCam([CX_B + 40, GY - 250, 1.6], [CX_B, GY - 520, 1.25], ease(seg(t, 4.3, 5.6)));
-    else if (t < 6.25) c = mixCam([CX_B, GY - 520, 1.25], [1105, GY - 238, 2.9], ease(seg(t, 5.95, 6.25)));
-    else if (t < 7.25) c = [1105 + 8 * (t - 6.25), GY - 238, 2.9 + .08 * (t - 6.25)];
-    else c = mixCam([1113, GY - 238, 2.98], [1196, GY - 262, 3.3], ease(seg(t, 7.25, 7.95)));
+    else if (t < 5.95) c = mixCam([CX_B + 40, GY - 250, 1.6], [CX_B, GY - 330, 1.25], ease(seg(t, 4.3, 5.6)));
+    else if (t < 6.25) c = mixCam([CX_B, GY - 330, 1.25], [BOOK.cx + 95, GY - 238, 2.9], ease(seg(t, 5.95, 6.25)));
+    else if (t < 7.25) c = [BOOK.cx + 95 + 8 * (t - 6.25), GY - 238, 2.9 + .08 * (t - 6.25)];
+    else c = mixCam([BOOK.cx + 103, GY - 238, 2.98], [BOOK.cx + 186, GY - 262, 3.3], ease(seg(t, 7.25, 7.95)));
     frame(t, c);
   }
   // C 8.44–11.25: whip back to the desk; the copy; the flick
   function shotC(t) {
-    const close = [1196, GY - 262, 3.3], desk = [640, GY - 150, 2.1], near = [612, GY - 128, 2.55];
+    const close = [BOOK.cx + 186, GY - 262, 3.3], desk = [640, GY - 150, 2.1], near = [612, GY - 128, 2.55];
     let c, wk = null;
     if (t < 8.85) { const k = seg(t, 8.44, 8.85); wk = [k, -1]; c = mixCam(close, desk, ease(k)); }
     else if (t < 10.6) c = mixCam(desk, near, ease(seg(t, 8.85, 10.45)));
@@ -726,7 +727,7 @@
     if (t < 11.85) c = [lerp(305, 268, ease(seg(t, 11.25, 11.85))), SY + 4, 2.6];
     else if (t < 13.0) c = mixCam([268, SY + 4, 2.6], VIS1, ease(seg(t, 11.85, 12.5)));
     else if (t < 14.2) c = mixCam(VIS1, [190, GY - 165, 2.4], ease(seg(t, 13.0, 13.6)));
-    else c = mixCam([190, GY - 165, 2.4], [268, GY - 300, 1.72], ease(seg(t, 14.2, 14.9)));
+    else c = mixCam([190, GY - 165, 2.4], [215, GY - 250, 1.72], ease(seg(t, 14.2, 14.9)));
     frame(t, c);
   }
   // E 15.63–19.38: the truth: Clawd has no idea; pull back through the wall to the two-shot
