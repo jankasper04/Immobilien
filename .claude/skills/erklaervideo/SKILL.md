@@ -26,8 +26,8 @@ Das Kit liegt in `erklaervideo/` und basiert auf [ClaudeAnimationBase](https://g
 
 ## Ablauf
 
-1. **Storyboard zuerst.** Schreib `erklaervideo/STORYBOARD.md` im Format aus dem Guide und ergänze oben die Zeile `Kernaussage:`. Zeig es dem Nutzer und warte auf ein OK, bevor du Code schreibst.
-2. **Bauen** Shot für Shot in `src/scenes/<name>.js`, wie im Guide beschrieben.
+1. **Storyboard zuerst.** Schreib `erklaervideo/STORYBOARD_<name>.md` im Format aus dem Guide und ergänze oben die Zeile `Kernaussage:`. Zeig es dem Nutzer und warte auf ein OK, bevor du Code schreibst.
+2. **Bauen** Shot für Shot in `src/scenes/<name>.js`, wie im Guide beschrieben. Trag die Szene mit `duration` und `bpm` in `SCENES` in `src/config.js` ein; gewählt wird sie über `SCENE` dort, `studio.html?scene=<name>` oder `render.mjs --scene=<name>`.
 3. **Prüfen** mit Contact Sheets, Strips und Crops (Review Loop im Guide). Schau die Bilder wirklich an.
 4. **Rendern** und das MP4 dem Nutzer schicken.
 
@@ -38,13 +38,13 @@ cd erklaervideo
 npm ci                                          # einmal pro neuer Session
 which ffmpeg || apt-get install -y ffmpeg       # falls ffmpeg fehlt
 R="node render.mjs --chrome=/opt/pw-browsers/chromium --soft-gl"
-$R --sheet=1,5,10 --cols=3 --w=360 --out=out/check/sheet.jpg     # Contact Sheet
-$R --frames --workers=4                                           # Frames, parallel und fortsetzbar
+$R --scene=<name> --sheet=1,5,10 --cols=3 --w=360 --out=out/check/sheet.jpg   # Contact Sheet
+$R --scene=<name> --frames --workers=1                                         # Frames, fortsetzbar
 node render.mjs --encode --out=out/video.mp4                      # zu MP4
 ```
 
-1. Hier gibt es keine GPU, deshalb `--soft-gl`. Damit das nicht quälend langsam wird, sind im Kit drei Dinge eingebaut: `--soft-gl` hält die 2D-Hilfsflächen von Chrome in Software, `paint()` und `inkLine()` überspringen Formen, die komplett außerhalb des Bildes liegen, und voll deckende Farbe wird ohne die teure Pigment-Mischung aufgetragen. Ein Frame braucht so etwa 1 Sekunde, ein 60 Sekunden Video (1440 Frames) mit `--workers=3` rund eine halbe Stunde.
+1. Hier gibt es keine GPU, deshalb `--soft-gl`. Damit das nicht quälend langsam wird, sind im Kit drei Dinge eingebaut: `--soft-gl` hält die 2D-Hilfsflächen von Chrome in Software, `paint()` und `inkLine()` überspringen Formen, die komplett außerhalb des Bildes liegen, und voll deckende Farbe wird ohne die teure Pigment-Mischung aufgetragen. Ein fertiger Frame braucht so etwa 3 Sekunden, ein 60 Sekunden Video (1440 Frames) also rund 70 Minuten. Nimm `--workers=1`: Mehrere Prozesse bremsen sich ohne GPU gegenseitig aus, und zwei Videos rendert man besser nacheinander als gleichzeitig. Die `ms/frame` Werte der Contact Sheets sind zu optimistisch, weil das Auslesen des Bildes fehlt.
 2. Große, flache Hintergrundflächen (Himmel, Wasser) malt `src/scenes/theseus.js` mit einer eigenen `flat()` Funktion statt mit `paint()`. Das sieht gleich aus und spart viel Zeit. Wenn ein Frame trotzdem mehrere Sekunden braucht, liegt es fast immer an großen `paint()`-Flächen oder vielen `fill`-Aquarellflächen.
 3. Auf einem Rechner mit Grafikkarte geht es ohne `--soft-gl` und deutlich schneller.
-4. Die Google Schrift „Permanent Marker“ lädt hier nicht (Zertifikat des Proxys). Das ist egal, solange kein Text im Bild ist.
+4. Die Schrift „Permanent Marker“ für `letter()` liegt lokal in `assets/` und lädt auch ohne Internet.
 5. `src/scenes/theseus.js` ist ein fertiges Beispiel im Hochformat: eine Welt mit einer Uhr, Spiegelung im Wasser, Kamerafahrten und harte Schnitte. Nimm es als Referenz für die Technik, nicht als Vorlage für die Geschichte.
