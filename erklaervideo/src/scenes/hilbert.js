@@ -21,7 +21,7 @@
   const C = {
     facade: '#B89A9E', facadeDk: '#9A7C8C', facadeLt: '#CBB0AE', trim: '#76597A', trimLt: '#E2CDBF',
     lobby: '#8A6C86', door: '#2F5160', lit: '#FFD98A', glow: '#FFC766', dark: '#2A2C58', frame: '#EFE0CC',
-    curtain: '#B8455A', sil: '#35273F', rim: '#FFE3A6', eye: '#FFF1C4', trail: '#FFE7B0',
+    curtain: '#B8455A', sil: '#35273F', rim: '#FFE3A6', eye: '#FFF1C4', trail: '#FFD27A',
     brass: '#E6AE3E', brassDk: '#A8741E', wood: '#7A4535', woodLt: '#9A5D45', rope: '#D8B27A',
     walk: '#6A5E7E', street: '#3F3853', bus: '#E8AA38', busRoof: '#F2C96B', busStripe: '#C8543E', busLit: '#FFE3A0',
     awn: '#C8455A', case: '#8A5A3C',
@@ -379,7 +379,7 @@
     push(); translate(x, y - 6); rotate(.06 * shake);
     const D = []; for (let i = 0; i <= 12; i++) { const a = Math.PI + i / 12 * Math.PI; D.push([Math.cos(a) * 25, Math.sin(a) * 22]); }
     paint(D, { wash: C.brass, ink: PAL.ink, sw: .9 });
-    inkLine([[-14, -12], [-6, -18]], 1.2, '#FFF1C4', 'inkfine', .3);
+    inkLine([[-14, -12], [-6, -18]], 1.2, '#FFF1C4', 'inkfine', 0);
     paint(rectPts(-3, -30 + 5 * press, 6, 9), { wash: C.brassDk, ink: PAL.ink, sw: .6 });
     paint(ellPts(0, -31 + 5 * press, 7, 4, 10), { wash: C.brassDk, ink: PAL.ink, sw: .6 });
     pop();
@@ -589,7 +589,7 @@
 
   // guests in the air: glowing trails first, then the leapers
   function drawFlights(t) {
-    const F = flights(t), sw = 1.8 / Math.max(VIEW.z, .35);
+    const F = flights(t), sw = 3.2 / Math.max(VIEW.z, .35);
     for (const f of F) {
       if (f.tail == null || f.tail >= f.k - .01) continue;
       const P = [], n = 16; for (let i = 0; i <= n; i++) P.push(pathPt(f, lerp(f.tail, f.k, i / n)));
@@ -623,8 +623,7 @@
     bus(t);
     drawFlights(t);
     camEnd();
-    if (o.streak != null) { streaks(o.streak, o.dir || 'v'); flushBrush(); }
-    if (window.DBG) { boilSeed('dbg'); inkLine([[100, 300], [900, 1600]], 6, '#FF0000', 'ink', 0); inkLine([[300, 300], [300, 1400]], 6, '#FF0000', 'ink', .2); paint(rectPts(600, 600, 200, 200), { wash: '#00FF00', ink: null }); }
+    if (o.streak != null) streaks(o.streak, o.dir || 'v');
     if (o.iris != null) iris2(o.iris);
   }
   function streaks(k, dir) {   // speed lines over whip pans and fast cranes
@@ -633,11 +632,10 @@
       const L = 400 + 600 * hash(i + 3);
       boilSeed('streak' + i);
       const col = i % 3 ? '#FFF1D0' : '#C9B8E8', w = (1.2 + 1.6 * hash(i + 7)) * a;
-      if (dir === 'v') { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .7; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], w, col, 'ink', .2); }
-      else { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], w, col, 'ink', .2); }
+      if (dir === 'v') { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .7; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], w, col, 'ink', 0); }
+      else { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], w, col, 'ink', 0); }
     }
   }
-  window.DBG = true;
   function iris2([x, y, r]) {
     flushBrush();
     flat([[-60, -60], [W + 60, -60], [W + 60, H + 60], [-60, H + 60]], PAL.ink, r < 3 ? null : ellPts(x, y, r, r, 48));
@@ -698,7 +696,7 @@
     frame(t, c, o);
   }
   // E 20.4–25.5: everyone to the double room; the pattern, forever
-  const TOWER2 = [600, GY - 1640, .5], TOP2 = [560, base(52), .27], BUSM = [760, GY - 380, .92];
+  const TOWER2 = [590, GY - 1560, .56], TOP2 = [560, base(36), .4], BUSM = [760, GY - 380, .92];
   function shotE(t) {
     let c, o = {};
     if (t < 23.3) { const sh = shakeXY(t, 14 * Math.exp(-(t - DONG[1]) * 6)); c = [TOWER2[0] + sh[0], TOWER2[1] + sh[1] - 25 * (t - 20.4), TOWER2[2] * (1 + .01 * (t - 20.4))]; }
@@ -715,9 +713,9 @@
     else if (t < 28.3) c = mixCam([BUSM[0] + 12, BUSM[1], BUSM[2]], FAN, ease(seg(t, 26.7, 27.5)));
     else if (t < 30.0) {
       const k = ease(seg(t, 28.3, 29.9)), yf = base(Math.max(3, front(Math.min(t, 29.9)) + 5));
-      c = [lerp(FAN[0], 820, k), lerp(FAN[1], Math.min(FAN[1], yf), ease(seg(t, 28.3, 28.9))), lerp(FAN[2], .3, k)];
+      c = [lerp(FAN[0], 820, k), lerp(FAN[1], Math.min(FAN[1], yf), ease(seg(t, 28.3, 28.9))), lerp(FAN[2], .36, k)];
     } else {
-      const top = [820, Math.min(FAN[1], base(front(29.9) + 5)), .3], k = seg(t, 30.0, 30.85);
+      const top = [820, Math.min(FAN[1], base(front(29.9) + 5)), .36], k = seg(t, 30.0, 30.85);
       c = mixCam(top, [700, GY - 420, .9], ease(k)); o.streak = k;
     }
     if (t > 30.85) c = [700 + 40 * (t - 30.85), GY - 420, .9 + .01 * (t - 30.85)];

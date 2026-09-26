@@ -143,9 +143,9 @@
   function knockArm(s, K, base = .25) {
     const last = K[K.length - 1];
     if (s < K[0] - .32 || s > last + .4) return null;
-    const keys = [[K[0] - .32, base], [K[0] - .14, .75]];
-    K.forEach((h, i) => { const nx = K[i + 1]; keys.push([h, 0, easeIn]); if (nx) keys.push([h + Math.min(.08, (nx - h) / 2), .5, easeOut]); });
-    keys.push([last + .12, .45, easeOut], [last + .4, base]);
+    const keys = [[K[0] - .32, base], [K[0] - .14, 1.5]];
+    K.forEach((h, i) => { const nx = K[i + 1]; keys.push([h, KNOCK_A, easeIn]); if (nx) keys.push([h + Math.min(.08, (nx - h) / 2), 1.38, easeOut]); });
+    keys.push([last + .12, 1.35, easeOut], [last + .4, base]);
     return kfe(s, keys);
   }
   // walking out: along the floor, through the gate, down (A) or up (B) the stairs to the landing
@@ -159,7 +159,7 @@
   // Clawd's place and pose: { x, y, o, inCell }
   function pose(who, tl, s) {
     const m = emotions(s, MOOD[tl][who]), ph = who === 'A' ? 0 : 2.1;
-    let x = CLX, y = FLOOR[who], dx = RED_DX, aR = HOVER + tremble(s, ph), aL = null, sq = 0, dy = 0, view = 'front', flip = false, walk = null, inCell = true;
+    let x = CLX, y = FLOOR[who], dx = 0, aR = HOVER + tremble(s, ph), aL = null, sq = 0, dy = 0, view = 'front', flip = false, walk = null, inCell = true;
     let calm = 1;   // damps the emotions' sway and lean while a paw has to land exactly
     const hits = [];
     if (tl === 'bad') {
@@ -168,20 +168,21 @@
       aR -= .18 * ease(seg(s, tempt, tempt + .8));                            // tempted: the paw sinks
       if (s >= 8) aR = .3 + .07 * Math.sin(s * 37 + ph);                      // trembling close over red
       if (s >= 10.4) {
-        aR = kfe(s, [[10.4, .3 + .07 * Math.sin(10.4 * 37 + ph)], [10.75, 1.3], [SLAM, PRESS, easeIn], [11.35, PRESS + .04], [11.8, -.3]]);
-        sq += -.07 * Math.sin(Math.PI * seg(s, 10.4, 10.8)) + (s > SLAM ? .08 * Math.exp(-9 * (s - SLAM)) : 0);
+        aR = kfe(s, [[10.4, .3 + .07 * Math.sin(10.4 * 37 + ph)], [10.75, 1.3], [SLAM, PRESS, easeIn], [11.35, PRESS + .04], [11.8, -.1]]);
+        sq += -.07 * Math.sin(Math.PI * seg(s, 10.4, 10.8)) + (s > SLAM ? .06 * Math.exp(-9 * (s - SLAM)) : 0);
         calm = 1 - bump(s, SLAM, .5);
       }
       const sit = ease(seg(s, 12.95, 13.6));
-      if (sit > 0) { sq += .17 * sit; aR = lerp(aR, -.75, sit); }
+      if (sit > 0 && !(s > 13.7 && s < 14.7)) { sq += .1 * sit; aR = lerp(aR, .05, sit); aL = lerp(m.aL ?? .2, .05, sit); }
+      else if (sit > 0) sq += .1 * sit;
     } else if (tl === 'good') {
       const K = who === 'A' ? KA : KB, t0 = who === 'A' ? 21.9 : 23.5, k0 = K[0];
-      dx = kfe(s, [[t0, RED_DX], [t0 + .45, 0], [k0 - .18, 0], [k0 - .08, KNOCK_DX], [K[3] + .1, KNOCK_DX], [K[3] + .4, 0]]);
-      aR = s < t0 ? .3 + .07 * Math.sin(s * 37 + ph) : kfe(s, [[t0, .3], [t0 + .4, -.15], [26.45, -.15], [26.8, HOVER], [27.3, HOVER], [27.45, 1.2], [GREEN, PRESS, easeIn], [27.9, PRESS + .04], [28.2, .05]]);
-      if (s > 26.8 && s < 27.3) aR += .03 * Math.sin(s * 9 + ph);
+      dx = kfe(s, [[k0 - .2, 0], [k0 - .05, KNOCK_DX], [K[3] + .1, KNOCK_DX], [K[3] + .4, 0]]);
+      aR = s < t0 ? .3 + .07 * Math.sin(s * 37 + ph) : kfe(s, [[t0, .3], [t0 + .4, -.1]]);   // the paw leaves red
       aL = knockArm(s, K);
+      if (s > K[3] + .4) aL = kfe(s, [[26.45, m.aL ?? .2], [26.8, HOVER], [27.3, HOVER + .03 * Math.sin(s * 9 + ph)], [27.45, 1.2], [GREEN, PRESS, easeIn], [27.9, PRESS + .04], [28.2, .1]]);
       hits.push(...K, GREEN);
-      sq += s > GREEN ? .07 * Math.exp(-9 * (s - GREEN)) : 0;
+      sq += s > GREEN ? .06 * Math.exp(-9 * (s - GREEN)) : 0;
       calm = (1 - bump(s, GREEN, .45)) * (1 - bump(s, (K[0] + K[3]) / 2, .6));
       // out of the cell, down or up the stairs, then the high five on the landing
       const [w0, w1] = WALK[who];
@@ -199,12 +200,12 @@
           sq += s > FIVE ? .1 * Math.exp(-8 * (s - FIVE)) * Math.cos(18 * (s - FIVE)) : 0;
         }
       }
-    } else {   // round 3: off red, one knock, then the paw over green
+    } else {   // round 3: the paw leaves red, one knock, then the knocking paw settles over green
       const k0 = EKNOCK[who];
-      dx = kfe(s, [[k0 - .5, RED_DX], [k0 - .14, KNOCK_DX], [37.2, KNOCK_DX], [37.7, 0]]);
-      aR = s < k0 - .5 ? HOVER + .5 * tremble(s, ph) : kfe(s, [[k0 - .5, HOVER], [k0 - .15, -.1], [37.25, -.1], [37.7, HOVER]]);
-      if (s > 37.7) aR = HOVER + .04 * Math.sin(s * 3 + ph);
+      dx = kfe(s, [[k0 - .25, 0], [k0 - .08, KNOCK_DX], [k0 + .35, KNOCK_DX], [k0 + .7, 0]]);
+      aR = s < k0 - .5 ? HOVER + .5 * tremble(s, ph) : kfe(s, [[k0 - .5, HOVER], [k0 - .15, -.1]]);
       aL = knockArm(s, [k0]);
+      if (s > k0 + .4) aL = kfe(s, [[k0 + .4, m.aL ?? .2], [37.7, HOVER]]) + (s > 37.7 ? .04 * Math.sin(s * 3 + ph) : 0);
       hits.push(k0);
       calm = 1 - bump(s, k0, .5);
     }
@@ -229,16 +230,16 @@
   // how far the paw pushes a button down (0..1): the dome gives way under the arm's lower edge
   function pressOf(P, who, bx) {
     if (!P.inCell) return 0;
-    const [tx, ty] = armTip(P.x, P.y, U, P.o, 'R');
+    const [tx, ty] = armTip(P.x, P.y, U, P.o, bx < CLX ? 'L' : 'R');
     if (Math.abs(tx - bx) > 1.15 * U) return 0;
-    return clamp((ty + .47 * U - (FLOOR[who] - (DOME_BASE + DOME_RY) * U)) / (DOME_DEPTH * U));
+    return clamp((ty + .44 * U - (FLOOR[who] - (DOME_BASE + DOME_RY) * U)) / (DOME_DEPTH * U));
   }
 
   // ---------- background (flat colour only) ----------
   const TG = [];   // tally groups on a cell's back wall: [x, y below the ceiling, order]
   for (let j = 0; j < 4; j++) for (let i = 0; i < 9; i++) {
     const x = 58 + i * 102 + (j % 2 ? 44 : 0) + (hash(i * 3 + j * 17) - .5) * 30, y = 40 + j * 84 + (hash(i * 11 + j * 5) - .5) * 14;
-    if (x > PIPE_X - 76 && x < PIPE_X + 34) continue;
+    if (x > PIPE_X - 80 && x < PIPE_X + 40) continue;
     if (x > WIN_X - 110 && x < WIN_X + 80 && y < 175) continue;
     if (x > GX0 - 70) continue;
     TG.push([x, y, hash(i * 7 + j * 13 + 1)]);
@@ -411,30 +412,28 @@
   }
   // the console with its two buttons; lit = latched glow, press = how far the paw pushes each dome
   function consoleAt(who, press, lit, t, tempt) {
-    const F = FLOOR[who], x0 = BTN_G - 1.55 * U, x1 = BTN_R + 1.55 * U, top = F - 2.85 * U;
-    boilSeed('console' + who);
-    paint(rectPts(x0, top, x1 - x0, F - top, .8), { wash: C.console, ink: PAL.ink, sw: 1 });
-    inkLine([[x0 + 4, top + 7], [x1 - 4, top + 7]], .6, '#B7BBCB', 'inkfine', 0);
+    const F = FLOOR[who];
     const btn = (bx, col, plate, litCol, p, L, sym, key) => {
+      const base = F - DOME_BASE * U, pw = 2.3 * U;
       boilSeed('btn' + who + key);
-      paint(rectPts(bx - .92 * U, F - 2.45 * U, 1.84 * U, 1.9 * U, .6), { wash: plate, ink: PAL.ink, sw: .7 });
-      const cy = F - 1.5 * U;
-      if (sym === 'heart') paint(heartPts(bx, cy + .1 * U, .62 * U), { wash: C.cream, ink: PAL.ink, sw: .5 });
+      paint(rectPts(bx - pw / 2 - .25 * U, F - .42 * U, pw + .5 * U, .42 * U, .5), { wash: '#6E7386', ink: PAL.ink, sw: .8 });
+      paint(rectPts(bx - pw / 2, base + .3 * U, pw, F - base - .72 * U, .6), { wash: C.console, ink: PAL.ink, sw: .9 });
+      paint(rectPts(bx - .82 * U, F - 1.9 * U, 1.64 * U, 1.36 * U, .5), { wash: plate, ink: PAL.ink, sw: .7 });
+      const cy = F - 1.22 * U;
+      if (sym === 'heart') paint(heartPts(bx, cy + .05 * U, .5 * U), { wash: C.cream, ink: PAL.ink, sw: .5 });
       else {   // a pointing hand, pointing at the other cell (A's down, B's up)
         push(); translate(bx, cy); rotate(who === 'A' ? Math.PI / 2 : -Math.PI / 2);
-        const hh = .6 * U;
+        const hh = .5 * U;
         paint(rrPts(-.75 * hh, -.5 * hh, 1 * hh, 1 * hh, .3 * hh), { wash: C.cream, ink: PAL.ink, sw: .5 });
         paint(rrPts(.1 * hh, -.46 * hh, 1.05 * hh, .34 * hh, .15 * hh), { wash: C.cream, ink: PAL.ink, sw: .5 });
-        paint(ellPts(-.2 * hh, -.62 * hh, .3 * hh, .18 * hh, 10), { wash: C.cream, ink: PAL.ink, sw: .45 });
         pop();
       }
-      const base = F - DOME_BASE * U, ry = (DOME_RY - DOME_DEPTH * p) * U;
-      const g = Math.max(L, key === 'r' ? tempt : 0);
-      if (g > .01) glow(bx, base - ry * .5, 2.6 * U, litCol, g);
-      paint(ellPts(bx, base + .05 * U, 1.25 * U, .26 * U, 16), { wash: C.iron, ink: PAL.ink, sw: .7 });
-      const D = []; for (let i = 0; i <= 14; i++) { const a = Math.PI + i / 14 * Math.PI; D.push([bx + Math.cos(a) * DOME_RX * U, base + Math.sin(a) * ry]); }
-      paint(D, { wash: mixCol(col, litCol, L * .7), ink: PAL.ink, sw: .8 });
-      paint(ellPts(bx - .35 * U, base - ry * .6, .22 * U, .1 * U, 8), { wash: C.cream, washOp: 200, ink: null });
+      const ry = (DOME_RY - DOME_DEPTH * p) * U, g = Math.max(L, key === 'r' ? tempt : 0);
+      if (g > .01) glow(bx, base - ry * .5, 3.2 * U, litCol, g);
+      paint(rectPts(bx - pw / 2 - .3 * U, base, pw + .6 * U, .34 * U, .5), { wash: '#6E7386', ink: PAL.ink, sw: .8 });
+      const D = []; for (let i = 0; i <= 16; i++) { const a = Math.PI + i / 16 * Math.PI; D.push([bx + Math.cos(a) * DOME_RX * U, base + Math.sin(a) * ry]); }
+      paint(D, { wash: mixCol(col, litCol, L * .7), ink: PAL.ink, sw: .9 });
+      paint(ellPts(bx - .5 * U, base - ry * .6, .32 * U, .13 * U, 8), { wash: C.cream, washOp: 200, ink: null });
     };
     btn(BTN_G, C.green, C.greenPlate, C.greenLit, press.g, lit.green, 'heart', 'g');
     btn(BTN_R, C.red, C.redPlate, C.redLit, press.r, lit.red, 'hand', 'r');
@@ -497,9 +496,8 @@
     boilSeed('panelL' + who);
     paint(rrPts(-182, -84, 174, 152, 20), { wash: '#FBE3A6', ink: PAL.ink, sw: .7 });
     paint(box(-178, 48, 166, 16), { wash: '#9CC57E', ink: null });
-    glow(-48, -30, 70, '#FFD27A', .5);
+    paint(starPts(-48, -30, 44, .62, 10, s * .8), { wash: '#F6BE4A', ink: null });
     paint(ellPts(-48, -30, 22, 22, 16), { wash: C.sun, ink: PAL.ink, sw: .5 });
-    for (let i = 0; i < 8; i++) { const a = i / 8 * TAU + s * .8; inkLine([[-48 + Math.cos(a) * 29, -30 + Math.sin(a) * 29], [-48 + Math.cos(a) * 40, -30 + Math.sin(a) * 40]], .8, '#E8A838', 'ink', 0); }
     paint(box(-178, -46, 42, 94), { wash: '#3A3D50', ink: PAL.ink, sw: .6 });
     const lift = 70 * ease(seg(s, ...B.door));
     for (let i = 0; i < 3; i++) inkLine([[-170 + i * 13, -46], [-170 + i * 13, 48 - lift]], 1.2, '#8A8898', 'ink', 0);
@@ -610,9 +608,9 @@
   }
 
   // ---------- shots ----------
-  const SPLIT = [470, 990, 1.2];
+  const SPLIT = [470, 1014, 1.35];
   const splitCam = (t, dz = 0) => [SPLIT[0] + 10 * Math.sin(t * .5), SPLIT[1] + 6 * Math.sin(t * .37), SPLIT[2] + dz];
-  const GATES = [640, 990, 1.15];
+  const GATES = [640, 1014, 1.25];
   const IRIS_AT = [PIPE_X, MID];   // the pipe inside the slab: the loop closes and opens here
   const kick = (t, t0, amt, k = 8) => t > t0 ? shakeXY(t, amt * Math.exp(-k * (t - t0))) : [0, 0];
 
@@ -622,7 +620,7 @@
     frame(t, c, t < .45 ? { iris: [...scr(IRIS_AT, c), lerp(0, 1700, easeIn(t / .45))] } : {});
   }
   // B 2.3–6.0 and C 6.0–8.0: the temptation in A, then (match cut) the same thought in B
-  const bubbleCam = (t, who) => { const k = t - 2.3; return [440 + 6 * k, 610 + (who === 'B' ? DY : 0) - 4 * k, 1.82 + .035 * k]; };
+  const bubbleCam = (t, who) => { const k = t - 2.3; return [CLX - 20 + 5 * k, FLOOR[who] - 112 - 4 * k, 2.0 + .03 * k]; };
   function shotB(t) { frame(t, bubbleCam(t, 'A')); }
   function shotC(t) { frame(t, bubbleCam(t, 'B')); }
   // D 8.0–10.4: match cuts between the two faces, faster and faster
@@ -630,7 +628,7 @@
   function shotD(t) {
     let n = 0; while (n + 2 < CUTS.length && t >= CUTS[n + 1]) n++;
     const who = n % 2 ? 'B' : 'A', lt = t - CUTS[n];
-    frame(t, [CLX + 3.3 * U + 10 * lt, FLOOR[who] - 5.1 * U, 2.5 + n * .1 + .08 * lt, (n % 2 ? -1 : 1) * (.015 + .01 * n)]);
+    frame(t, [CLX + 3.0 * U + 10 * lt, FLOOR[who] - 5.1 * U, 2.4 + n * .1 + .08 * lt, (n % 2 ? -1 : 1) * (.015 + .01 * n)]);
   }
   // E 10.4–13.3: both slam red; they look to their gates; the bolts drop
   function shotE(t) {
@@ -641,18 +639,18 @@
   }
   // F 13.3–19.4: the big hourglasses; the time lapse
   function shotF(t) {
-    let c = mixCam(GATES, [440, 995, 1.16], ease(seg(t, 13.3, 13.85)));
-    if (t > 14.5) c = mixCam(c, [470, 1000, 1.3], ease(seg(t, 14.5, 19.4)));
+    let c = mixCam(GATES, [430, 1014, 1.3], ease(seg(t, 13.3, 13.85)));
+    if (t > 14.5) c = mixCam(c, [470, 1014, 1.45], ease(seg(t, 14.5, 19.4)));
     const sh = kick(t, BIG.drop[1], 12);
     frame(t, [c[0] + sh[0], c[1] + sh[1], c[2]]);
   }
   // G 19.4–21.0: rewind
   function shotG(t) {
-    const k = seg(t, ...REW), c = mixCam([470, 1000, 1.3], splitCam(t), ease(k));
+    const k = seg(t, ...REW), c = mixCam([470, 1014, 1.45], splitCam(t), ease(k));
     frame(t, [c[0], c[1], c[2] * (1 - .06 * Math.sin(Math.PI * k)), -.05 * Math.sin(Math.PI * k)]);
   }
   // H 21.0–26.4: déjà vu; A knocks, the pulses travel down; B knocks back, the pulses travel up
-  const KN = w => [335, FLOOR[w] - 170, 1.75];
+  const KN = w => [350, FLOOR[w] - 190, 1.85];
   function shotH(t) {
     let c;
     if (t < 21.8) c = splitCam(t);
