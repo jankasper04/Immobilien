@@ -12,7 +12,7 @@
   const FX = 760, S = 460;                      // the catch point sits at FX; one track unit is S px at level 0
   const U = 26, TS = 1.1;                       // Clawd's unit, the tortoise's scale
   const FIN = 1 + 320 / S;                      // the finish line, just past the spot where the tortoise gets caught
-  const C_LAND = 1 + 561 / S;                   // where Clawd's nose lands after the hop
+  const C_LAND = 1 + 540 / S;                   // where Clawd's nose lands after the hop
   const COL = {
     red: '#D8394E', cream: '#FFF5E2', stone: '#D6CCBC', goldR: '#F0A03C', goldC: '#FFE59A',
     path: '#E8D4A6', pathDk: '#D9BF8C', meadow: '#A9C893', soil: '#B48C62', soilDk: '#9C774F',
@@ -127,7 +127,7 @@
       const kind = i < 5 ? 'blade' : i < 7 ? 'tuft' : 'dand', z = gsz(g), rho = rhoOf(h1, hash(g * 3.3 + i * 29.9));
       const hgt = (kind === 'blade' ? .13 + .09 * h2 : kind === 'tuft' ? .07 + .04 * h2 : .17 + .06 * h2) * z;
       const x = FX - rho * z;
-      if (hgt < 10 || hgt > 5200) continue;
+      if (hgt < 16 || hgt > 5200) continue;
       if (x + hgt * .4 < VIEW.x0 - 40 || x - hgt * .4 > VIEW.x1 + 40) continue;
       out.push({ kind, x, hgt, seed: h3, key: g + '_' + i });
     }
@@ -158,7 +158,7 @@
     boilSeed('da' + it.key);
     inkLine([[x, base], [x + sway * .4, base - hgt * .5], top], sw * 1.4, sky(COL.stem, '#6E7F74'), 'ink', .5);
     paint(ellPts(top[0], top[1], r, r, 22, r * .04), { wash: sky('#FBF6EA', '#F4EEF6'), ink: PAL.ink, sw: sw * .7 });
-    for (let k = 0; k < 9; k++) { const a = k / 9 * TAU + seed; inkLine([[top[0], top[1]], [top[0] + Math.cos(a) * r * .8, top[1] + Math.sin(a) * r * .8]], sw * .35, '#C9BFB0', 'inkfine', 0); }
+    if (r > 10) for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + seed; inkLine([[top[0], top[1]], [top[0] + Math.cos(a) * r * .8, top[1] + Math.sin(a) * r * .8]], sw * .35, '#C9BFB0', 'inkfine', 0); }
     paint(ellPts(top[0], top[1], r * .16, r * .16, 10), { wash: '#C9A96B', ink: null });
   }
   // the ant: generation 4, so it is tortoise-sized around level 4; it walks along behind the path
@@ -253,7 +253,7 @@
     for (let g = Math.max(0, gl - 4); g <= gl + 3; g++) for (let i = 0; i < NS; i++) {
       const z = gsz(g), rr = .022 + .05 * hash(g * 7.7 + i * 3.3), r = rr * z, rho = rhoOf(hash(g * 41.3 + i * 9.1), hash(g * 5.1 + i * 2.7)), d = rr + .03 + 1.2 * Math.pow(2, -4.5 * hash(g * 13.9 + i * 17.7));
       const x = FX - rho * z, y = CURB1 + d * z;
-      if (r < 5 || r > 900 || y - r < CURB1 + 4) continue;
+      if (r < 7 || r > 900 || y - r < CURB1 + 4) continue;
       if (!inView(x - r, x + r, y - r, y + r)) continue;
       const cc = ['#C8B597', '#B3A184', '#D6C7A8', '#A99479'][i % 4];
       boilSeed('st' + g + '_' + i);
@@ -410,13 +410,15 @@
     if (te < HOP0 - .35) {
       const h = lerp(.25, 0, ease(seg(te, ARR, ARR + .15))), sit = easeOut(seg(te, SIT, SIT + .16)) * (1 - ease(seg(te, SP1 + .05, SP1 + .3)));
       const bump = spring(te, SIT + .16, 8, 22) * (te < SP1 ? 1 : 0), look = te > SP0 - .3 && te < SP1 ? { lookX: lerp(-1, .6, seg(te, SP0, SP1)), lookY: .7 } : {};
-      return { x, o: { ...m, ...headView(h, ARR, ARR + .15, te), ...look, sq: (m.sq || 0) * (1 - sit) + .3 * sit + .1 * bump, rot: (m.rot || 0) * (1 - .6 * sit) + .08 * sit, dx: (m.dx || 0) * (1 - sit),
+      const back = ease(seg(te, ARR, ARR + .15)) * (1 - ease(seg(te, HOP0 - .35, HOP0 - .2))) * (1.9 + 1.2 * sit) * U;
+      return { x: x - back, o: { ...m, ...headView(h, ARR, ARR + .15, te), ...look, sq: (m.sq || 0) * (1 - sit) + .3 * sit + .1 * bump, rot: (m.rot || 0) * (1 - .6 * sit) + .08 * sit, dx: (m.dx || 0) * (1 - sit),
         dy: (m.dy || 0) * (1 - sit), aL: sit > .5 ? -1.1 : m.aL, aR: sit > .5 ? -.9 : m.aR, hat: HAT } };
     }
     // the hop over the tortoise
     if (te < HOP1 + .1) {
       const h = lerp(0, .25, ease(seg(te, HOP0 - .35, HOP0 - .2))), j = jump(te, HOP0, HOP1, 10), air = seg(te, HOP0, HOP1);
-      return { x, o: { ...m, ...headView(h, HOP0 - .35, HOP0 - .2, te), dy: j.dy, sq: j.sq, rot: .3 * Math.sin(Math.PI * air), aL: 1.3, aR: 1.1, dx: 0, lookX: 1, hat: HAT } };
+      const back = (1 - ease(seg(te, HOP0 - .35, HOP0 - .2))) * 1.9 * U;
+      return { x: x - back, o: { ...m, ...headView(h, HOP0 - .35, HOP0 - .2, te), dy: j.dy, sq: j.sq, rot: .3 * Math.sin(Math.PI * air), aL: 1.3, aR: 1.1, dx: 0, lookX: 1, hat: HAT } };
     }
     // landed: proud; then turn back to the tortoise and laugh
     const h = te < LAUGH - .35 ? lerp(.25, 0, ease(seg(te, HOP1 + .12, HOP1 + .28))) : lerp(0, -.125, ease(seg(te, LAUGH - .35, LAUGH - .15)));
@@ -488,7 +490,7 @@
   const CAM_STEP = [522, GY - 230, 1.2];
   const CAM_WIDE = [680, GY - 250, .95];
   const CAM_FIN = [FX + 210, GY - 230, 1.0];
-  const CAM_LAUGH = [FX + 305, GY - 220, 1.3];
+  const CAM_LAUGH = [FX + 295, GY - 185, 1.55];
   // the zoom section: level space keeps the gap the same; the camera only drifts, leans in on reactions and sways
   function stepCam(t) {
     const te = t, s = stepAt(te) || STEP[0];
@@ -553,7 +555,7 @@
     // iris in on Clawd at the start, iris out on Clawd at the end: the loop's seam
     const head = () => { cam(c); const p = toScreen(cl.x + .5 * U, GY - 5 * U); camEnd(); return p; };
     if (t < .45) iris2([...head(), lerp(0, 1500, easeIn(t / .45))]);
-    if (t > IRIS1) iris2([...head(), lerp(1500, 0, easeIn(seg(t, IRIS1, DUR - .04)))]);
+    if (t > IRIS1) iris2([...head(), lerp(1500, 0, ease(seg(t, IRIS1, DUR - .04)))]);
   }
 
   shots([[0, frame]]);

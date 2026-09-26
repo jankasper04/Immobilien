@@ -623,7 +623,8 @@
     bus(t);
     drawFlights(t);
     camEnd();
-    if (o.streak != null) streaks(o.streak, o.dir || 'v');
+    if (o.streak != null) { streaks(o.streak, o.dir || 'v'); flushBrush(); }
+    if (window.DBG) { boilSeed('dbg'); inkLine([[100, 300], [900, 1600]], 6, '#FF0000', 'ink', 0); inkLine([[300, 300], [300, 1400]], 6, '#FF0000', 'ink', .2); paint(rectPts(600, 600, 200, 200), { wash: '#00FF00', ink: null }); }
     if (o.iris != null) iris2(o.iris);
   }
   function streaks(k, dir) {   // speed lines over whip pans and fast cranes
@@ -636,6 +637,7 @@
       else { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], w, col, 'ink', .2); }
     }
   }
+  window.DBG = true;
   function iris2([x, y, r]) {
     flushBrush();
     flat([[-60, -60], [W + 60, -60], [W + 60, H + 60], [-60, H + 60]], PAL.ink, r < 3 ? null : ellPts(x, y, r, r, 48));
