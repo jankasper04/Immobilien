@@ -210,7 +210,7 @@
   });
   Object.assign(EX[EX.length - 1], { ca: 35.15, rd: 35.4, rx: 35.75, ts: 36.45 });
   // the last question: the same glyph as the opening card, so the loop closes
-  EX.push({ q: 0, a: 9, final: true, bv: 36.6, w0: 36.9, w1: 37.7, fl: 38.1, in1: 38.7, arrive: ARRIVE, inX: tt => lerp(LEDGE_X, ARRIVE, easeOut(seg(tt, 38.1, 38.7))),
+  EX.push({ q: 0, a: 9, final: true, bv: 36.6, w0: 36.9, w1: 37.7, fl: 38.1, in1: 39.1, arrive: 430, inX: tt => lerp(LEDGE_X, 430, ease(seg(tt, 38.12, 39.1))),
     gr: 99, wk0: 99, wk1: 99, f0: 99, f1: 99.5, nf: 0, fd: 99, bk0: 99, bk1: 99, put: 99, bl: 99, p0: 99, p1: 99, pu: 99, out1: 99.5, outX: () => PAINT_X, ca: 99, rd: 99, rx: 99, ts: 99 });
 
   // page flips, the spread each exchange ends on, and the chat log for the screen
@@ -424,17 +424,23 @@
   function chat(t) {
     let n = 0; while (n < MSGS.length && MSGS[n].t <= t) n++;
     if (!n) return;
-    const last = MSGS[n - 1].t, slide = 1 - ease(seg(t, last, last + .22)), popK = backOut(seg(t, last + .12, last + .38)), BH = 76, BW = 196, P = 88, yb = MON.sy1 - 16 - BH / 2;
+    const last = MSGS[n - 1].t, slide = 1 - ease(seg(t, last, last + .22)), popK = backOut(seg(t, last + .12, last + .38)), BH = 76, BW = 180, P = 88, yb = MON.sy1 - 16 - BH / 2;
     for (let j = 0; j < Math.min(n, 6); j++) {
       const mg = MSGS[n - 1 - j], cy = yb - j * P + (j ? slide * P : 0), top = cy - BH / 2;
       const sc = (j ? 1 : popK) * clamp((top - MON.sy0 - 4) / 30); if (sc < .05) continue;
-      const q = mg.side === 'q', cx = q ? MON.sx0 + 22 + BW / 2 : MON.sx1 - 22 - BW / 2;
+      const q = mg.side === 'q', cx = q ? MON.sx0 + 70 + BW / 2 : MON.sx1 - 70 - BW / 2;
       push(); translate(cx, cy); scale(sc);
       boilSeed('bub' + (n - 1 - j));
       const tail = q ? [[-BW / 2 + 16, BH / 2 - 10], [-BW / 2 - 12, BH / 2 + 12], [-BW / 2 + 40, BH / 2 - 4]] : [[BW / 2 - 16, BH / 2 - 10], [BW / 2 + 12, BH / 2 + 12], [BW / 2 - 40, BH / 2 - 4]];
       paint(tail, { wash: q ? COL.bubQ : COL.bubA, ink: PAL.ink, sw: .6 });
       paint(rrPts(-BW / 2, -BH / 2, BW, BH, 26), { wash: q ? COL.bubQ : COL.bubA, ink: PAL.ink, sw: .7 });
       if (VIEW.z > 1.2) glyph(mg.g, 0, 0, 27, q ? COL.gQ : COL.gA, 1, 'bg' + (n - 1 - j)); else miniGlyph(mg.g, 0, 0, 26, q ? COL.gQ : COL.gA, 1.2);
+      // the avatars: the visitor (blue, top hat) asks, a gold genius answers
+      const ax = q ? -BW / 2 - 38 : BW / 2 + 38, ay = BH / 2 - 16;
+      paint(ellPts(ax, ay, 22, 22, 16), { wash: q ? COL.vis : COL.gold, ink: PAL.ink, sw: .6 });
+      if (q) { paint(rectPts(ax - 10, ay - 42, 20, 24, .5), { wash: PAL.ink, ink: null }); paint(rectPts(ax - 17, ay - 22, 34, 6, .5), { wash: PAL.ink, ink: null }); }
+      else paint([[ax - 16, ay - 16], [ax + 16, ay - 16], [ax + 2, ay - 52]], { wash: PAL.violet, ink: PAL.ink, sw: .5 });
+      paint(ellPts(ax - 7, ay - 2, 3, 4, 8), { wash: PAL.ink, ink: null }); paint(ellPts(ax + 7, ay - 2, 3, 4, 8), { wash: PAL.ink, ink: null });
       pop();
     }
   }
@@ -681,8 +687,8 @@
     for (let i = 0; i < 14; i++) {
       boilSeed('whip' + i);
       const L = 380 + 500 * hash(i + 3);
-      if (dir) { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
-      else { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .6; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 3 * a, i % 3 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
+      if (dir) { const y = (i + .5) / 14 * H + jit(20), x = W / 2 + (hash(i) - .5) * W * .6; inkLine([[x - L / 2, y], [x + L / 2, y + jit(6)]], 2.6 * a, i % 5 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
+      else { const x = (i + .5) / 14 * W + jit(20), y = H / 2 + (hash(i) - .5) * H * .6; inkLine([[x, y - L / 2], [x + jit(6), y + L / 2]], 2.4 * a, i % 5 ? '#FFFFFF' : PAL.ink, 'dry', 0); }
     }
   }
   // the iris is the slot's own shape: a tall rounded opening
@@ -769,7 +775,7 @@
     else if (t < 38.1) c = mixCam(VIS1, [262, GY - 135, 2.45], ease(seg(t, 35.15, 37.9)));
     else { const k = ease(seg(t, 38.1, 39.5)); c = [lerp(262, WL0 - 4, k), lerp(GY - 135, SY, k), 2.45 * Math.pow(6 / 2.45, k)]; }
     frame(t, c, { whip: wk });
-    if (t > 38.45) { const [sx, sy] = scr([WL0 - 4, SY], c); slotIris(sx, sy, kf(t, [[38.45, 1500], [39.75, 0]], easeIn)); }
+    if (t > 38.75) { const [sx, sy] = scr([WL0 - 4, SY], c); slotIris(sx, sy, kf(t, [[38.75, 1500], [39.75, 0]], easeIn)); }
   }
 
   shots([[0, shotA], [3.44, shotB], [8.44, shotC], [11.25, shotD], [15.625, shotE], [19.375, shotF], [28.125, shotG], [34.375, shotH]]);
