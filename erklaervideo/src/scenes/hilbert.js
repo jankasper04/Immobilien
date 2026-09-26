@@ -468,7 +468,7 @@
   // the receptionist's cap, painted in body space on top of the head
   const cap = o => (u, sw) => {
     const V = VIEWS[o.view] || VIEWS.front;
-    push(); translate(V.hat * u + 1.1 * u, -8 * u); rotate(.14);
+    push(); translate(V.hat * u + 2.3 * u, -8 * u); rotate(.16);
     paint(rectPts(-1.8 * u, -1.9 * u, 3.6 * u, 1.95 * u), { wash: '#C8324A', ink: PAL.ink, sw: sw * .7 });
     paint(rectPts(-1.8 * u, -.62 * u, 3.6 * u, .45 * u), { wash: '#F2C14E', ink: null });
     pop();

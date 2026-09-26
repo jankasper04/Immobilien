@@ -71,6 +71,7 @@
   DP.forEach((tp, i) => PECKS.push({ tp, d: i < 7 ? .45 : .85, toss: i < 8 ? 'back' : null, slot: ORDER[9 - i] }));
   PECKS.sort((a, b) => a.tp - b.tp);
   const FLY = [20.62, 21.5];                           // the gull flies off with the second-to-last grain
+  const PLANT = 8.82;                                  // Clawd lets go of the spade
 
   // ---------- sky ----------
   const SKIES = {
@@ -90,7 +91,7 @@
   const sunOf = d => kf(d, [[12, [HX + 600, GY - 1780]], [16, [HX + 700, GY - 1120]], [18.3, [HX + 720, HORIZON - 30]], [19.2, [HX + 740, HORIZON + 90]]], x => x);
 
   // ---------- background ----------
-  function background(t, S, day) { if (window.NOBG) { flat([[-5000,-5000],[5000,-5000],[5000,5000],[-5000,5000]], "#EFD9A8"); return; }
+  function background(t, S, day) {
     const { x0, x1, y0, y1 } = VIEW, m = 120, step = 120;
     const xs = Math.floor((x0 - m) / step) * step, xe = Math.ceil((x1 + m) / step) * step;
     const band = (ya, yb, col, wa, wb) => {   // a flat band between two gently waving edges
@@ -195,7 +196,7 @@
     }
   }
   // speckles: fixed in the world, shown where the heap still is (so the surface sweeps down over them as it shrinks)
-  function speckles(h, S) { if (window.NOSP) return;
+  function speckles(h, S) {
     const w = K * h, fine = Z > 2.2, sp = fine ? 17 : 46, skip = Z < .85 ? 2 : 1;
     const i0 = Math.floor(Math.max(HX - w, VIEW.x0 - 10) / sp), i1 = Math.ceil(Math.min(HX + w, VIEW.x1 + 10) / sp);
     const j0 = Math.max(0, Math.floor((GY - VIEW.y1 - 10) / sp)), j1 = Math.ceil(Math.min(h, GY - VIEW.y0 + 10) / sp);
@@ -285,6 +286,7 @@
     const [fx, fy] = gullFeet(t), g = { x: fx, y: fy, s: 1, flip: false, r: 0, head: HEAD_REST.slice(), ang: 0, open: 0, carry: false, fly: null };
     const idle = Math.sin(t * 2.3) * 2;
     g.head[1] += idle;
+    if (t < .6) { g.ang = .35; g.head[0] += 3; g.head[1] += 4; }
     const p = peckOf(t);
     if (p) {
       const d = p.d, u = t - p.tp;
@@ -333,7 +335,7 @@
       if (p.toss === 'clawd') sparkleAt(x + 10, y - 10, 16, frac(t * 3));
     });
   }
-  const CLAWD_LAND = [CX0 - 150, GY - 6];
+  const CLAWD_LAND = [CX0 - 235, GY - 4];
 
   // ---------- the new pile, and the handful ----------
   function handful(t, S) {
@@ -402,7 +404,8 @@
     const lying = t >= 21.0;
     if (t < 3.7) { p.view = 'front'; p.aR = 1.25 + .06 * Math.sin(t * 5); }
     else { Object.assign(p, turn(t, 3.72, 3.92, 0, -.125)); }
-    if (t > 3.7 && t < 8.95) p.aR = kf(t, [[3.7, 1.25], [3.95, .2], [8.4, .2], [8.62, .9], [8.82, -1.45], [8.95, -.4]], easeOut);   // lower the spade; stab it into the sand
+    if (t > 3.7 && t < PLANT) p.aR = kf(t, [[3.7, 1.25], [4.0, -1.3]], easeOut);   // the spade goes down like a staff; let go when the time lapse starts
+    else if (t >= PLANT && t < PLANT + .35) p.aR = lerp(-1.3, m.aR ?? .2, easeOut(seg(t, PLANT, PLANT + .35)));
     // walking with the shrinking heap
     if (t >= 8.8 && t < 14.4) { const w = (CX0 - x) / (4 * U); p.walk = w; if (Math.abs(heightOf(t + .05) - heightOf(t)) > .5) p.dy = -.35 * Math.abs(Math.sin(w * Math.PI)); }
     // the nods: lean in toward the heap and dip
@@ -431,7 +434,6 @@
     paint(rectPts(0, -3.5, 72, 7, .5), { wash: '#C99A64', ink: INK, sw: sw * .6 });
     paint(through([[68, -13], [96, -12], [110, 0], [96, 12], [68, 13], [68, -13]], 3), { wash: '#5B93C9', ink: INK, sw: sw * .7 });
   }
-  const PLANT = 8.82;
   function stuckSpade() {
     const c = clawdAt(PLANT), a = armPt(c.x, c.y, U, c.o, 'R', 2.2), b = armPt(c.x, c.y, U, c.o, 'R', 3.2);
     boilSeed('spade');
@@ -548,26 +550,26 @@
 
   // ---------- shots ----------
   const PEAK0 = peakGrain(H0);
-  const ECU0 = [PEAK0[0] - 4, PEAK0[1] - 38, 5.8];
+  const ECU0 = [PEAK0[0] - 8, PEAK0[1] - 30, 7.0];
   const WIDE = [HX + 330, GY - 470, .64];
   // A 0–3.6: the beak takes a grain; pull back: a gull on a huge heap, Clawd proud at its foot
   function shotA(t) {
     let c;
     const up = ease(seg(t, .62, 1.3));
-    if (t < 1.3) c = [ECU0[0] - 12 * up, ECU0[1] - 62 * up, ECU0[2] + .15 * t - .6 * up];
-    else if (t < 3.0) c = camMix([ECU0[0] - 12, ECU0[1] - 62, ECU0[2] + .195 - .6], WIDE, ease(seg(t, 1.3, 3.0)));
+    if (t < 1.3) c = [ECU0[0] - 12 * up, ECU0[1] - 55 * up, ECU0[2] + .2 * t - 1.2 * up];
+    else if (t < 3.0) c = camMix([ECU0[0] - 12, ECU0[1] - 55, ECU0[2] + .26 - 1.2], WIDE, ease(seg(t, 1.3, 3.0)));
     else c = [WIDE[0], WIDE[1], WIDE[2] + .05 * seg(t, 3.0, 3.6)];
     const at = scr(PEAK0, c);
     frame(t, c, t < .36 ? { iris: [at[0], at[1], lerp(30, 1500, easeOut(t / .36))] } : {});
   }
   // B 3.6–8.4: Clawd checks: still a heap. The gull takes the next one.
-  const B1 = [CX0 - 200, GY - 300, 1.06];
+  const B1 = [CX0 - 175, GY - 205, 1.33];
   function shotB1(t) {
     const up = ease(seg(t, 4.3, 4.8)) * (1 - ease(seg(t, 5.2, 5.9)));
-    frame(t, [B1[0] - 20 * seg(t, 3.6, 6), B1[1] - 110 * up, B1[2] + .05 * seg(t, 3.6, 6)]);
+    frame(t, [B1[0] - 20 * seg(t, 3.6, 6), B1[1] - 150 * up, B1[2] + .06 * seg(t, 3.6, 6)]);
   }
-  function shotB2(t) { frame(t, [HX + 20, GY - H0 - 50, 2.1 + .12 * seg(t, 6, 7.2)]); }
-  const B3 = [CX0 - 150, GY - 250, 1.28];
+  function shotB2(t) { frame(t, [HX - 5, GY - H0 - 35, 2.55 + .15 * seg(t, 6, 7.2)]); }
+  const B3 = [CX0 - 150, GY - 215, 1.42];
   function shotB3(t) { frame(t, [B3[0] + 15 * seg(t, 7.2, 8.4), B3[1], B3[2] + .04 * seg(t, 7.2, 8.4)]); }
   // C 8.4–14.4: time lapse. The camera cranes down with the top of the heap.
   const TL = h => { const q = seg(950 - h, 0, 740); return camMix([HX + 400, GY - 510, .74], [HX + 190, GY - 190, 1.45], q); };

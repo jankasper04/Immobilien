@@ -90,13 +90,16 @@
     const add = (P, w0 = .24, w1 = .08) => S.push({ P, w0, w1 });
     const dot = (x, y, r = .11) => S.push({ dot: [x + (h(40) - .5) * .1, y + (h(41) - .5) * .1], r });
     const type = i % 6;
-    if (type === 0) {          // a sweeping tail that winds into a spiral, a dot above
-      add(sm([[.82, .5], [.35, .74], [-.3, .66], [-.58, .22]]).concat(spiralP(-.06, -.14, .52, .06, Math.PI * .95, 1.25 + .2 * h(1), 1).slice(1)), .28, .07);
-      dot(.6, -.66, .12);
-    } else if (type === 1) {   // a stem, a loop, a hooked tail; two dots beside it
-      const lp = []; for (let k = 0; k <= 18; k++) { const a = 2.6 - k / 18 * TAU * 1.02; lp.push([.15 + Math.cos(a) * .3, -.42 + Math.sin(a) * .3]); }
-      add(sm([[-.32, .86], [-.24, .3], [-.12, -.18]]).concat(lp.slice(1), sm([[-.05, -.2], [.3, .18], [.7, .52], [.86, .3]]).slice(1)), .26, .08);
-      dot(-.72, -.34, .1); dot(-.72, .08, .1);
+    if (type === 0) {          // a big spiral with three spikes off its rim and a dot
+      add(spiralP(-.12, -.04, .64, .06, Math.PI * 1.1, 1.35, 1, 26), .26, .07);
+      for (const [a0, l] of [[.25, .28], [.8, .36], [1.35, .26]]) add([[-.12 + Math.cos(a0) * .7, -.04 + Math.sin(a0) * .7], [-.12 + Math.cos(a0) * (.7 + l), -.04 + Math.sin(a0) * (.7 + l)]], .16, .03);
+      dot(-.7, -.72, .12);
+    } else if (type === 1) {   // a sprout: a ring with three petals fanning up from it, two dots beside it
+      add(circ(0, .5, .2, 14, -Math.PI / 2), .15, .15);
+      add(sm([[-.08, .3], [-.36, -.1], [-.7, -.52]]), .26, .06);
+      add(sm([[0, .29], [.04, -.25], [-.04, -.86]]), .26, .06);
+      add(sm([[.08, .3], [.4, -.02], [.72, -.34]]), .26, .06);
+      dot(.66, .52, .1); dot(.84, .3, .09);
     } else if (type === 2) {   // a wave with a ring over a crest and a slash under it
       const wv = []; for (let k = 0; k <= 12; k++) { const x = -.85 + 1.7 * k / 12; wv.push([x, -.02 + .26 * Math.sin(x * Math.PI * 1.45 + .4)]); }
       add(J(wv, .06), .26, .1);
@@ -107,10 +110,11 @@
       add(J(ar, .06).concat(spiralP(.5, .42, .22, .05, 0, .9, 1, 10).slice(1)), .26, .07);
       dot(-.22, .3, .12); dot(.14, .5, .1);
       add(sm([[-.14, -.8], [.1, -.9], [.34, -.8]]), .13, .05);
-    } else if (type === 4) {   // a zig-zag that ends in a curl, a bar with a dot above
-      add(J([[-.8, -.5], [-.46, .46], [-.08, -.34], [.26, .5]], .08).concat(spiralP(.46, .22, .3, .05, 2.3, 1.05, -1, 16).slice(1)), .24, .07);
-      add(sm([[-.62, -.86], [-.1, -.78], [.36, -.84]]), .14, .1);
-      dot(.62, -.82, .1);
+    } else if (type === 4) {   // a drop with a spiral inside and two rays off its point
+      add(through(J([[.55, -.72], [-.12, -.36], [-.56, .2], [-.3, .72], [.26, .72], [.56, .32], [.48, -.2], [.55, -.72]], .06), 4), .2, .1);
+      add(spiralP(.02, .3, .24, .04, 0, 1.1, 1, 14), .12, .05);
+      add(sm([[.66, -.76], [.84, -.9], [.96, -.86]]), .12, .05);
+      add(sm([[.62, -.62], [.86, -.56], [.96, -.44]]), .12, .05);
     } else {                   // an almond with a pupil and a curled tail
       add(through(J([[-.78, .02], [-.3, -.42], [.26, -.44], [.76, -.02], [.26, .36], [-.3, .38], [-.74, .06]], .06), 4).concat(sm([[.76, -.02], [.94, .36], [.74, .72], [.46, .62]]).slice(1)), .2, .07);
       dot(0, -.03, .15);

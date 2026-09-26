@@ -149,7 +149,7 @@
     return kfe(s, keys);
   }
   // walking out: along the floor, through the gate, down (A) or up (B) the stairs to the landing
-  const PATH = { A: [[CLX, AF], [GX1, AF], [LAND_X, LY], [MEET + 3.33 * U, LY]], B: [[CLX, BF], [GX1, BF], [LAND_X, LY], [MEET - 3.33 * U, LY]] };
+  const PATH = { A: [[CLX, AF], [GX1, AF], [LAND_X, LY], [MEET + 3.8 * U, LY]], B: [[CLX, BF], [GX1, BF], [LAND_X, LY], [MEET - 3.8 * U, LY]] };
   const pathLen = P => P.slice(1).reduce((l, p, i) => l + Math.hypot(p[0] - P[i][0], p[1] - P[i][1]), 0);
   function pathAt(P, d) {
     for (let i = 1; i < P.length; i++) { const L = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]); if (d <= L) return [lerp(P[i - 1][0], P[i][0], d / L), lerp(P[i - 1][1], P[i][1], d / L)]; d -= L; }
@@ -196,7 +196,7 @@
         if (who === 'A' && s > w1) { const tn = turn(s, w1, w1 + .15, .25, -.25); view = tn.view; flip = tn.flip; m.smear = tn.smear; m.smearDir = 0; }
         if (s > FIVE - .2) {   // the high five: the near arm swings up, the paws meet between them
           view = 'side'; flip = who === 'A';
-          aL = kfe(s, [[FIVE - .18, .3], [FIVE, 1.3, easeIn], [FIVE + .16, 1.42, easeOut], [FIVE + .5, .2]]);
+          aL = kfe(s, [[FIVE - .18, .3], [FIVE, 1.15, easeIn], [FIVE + .16, 1.25, easeOut], [FIVE + .5, .2]]);
           sq += s > FIVE ? .1 * Math.exp(-8 * (s - FIVE)) * Math.cos(18 * (s - FIVE)) : 0;
         }
       }
@@ -581,7 +581,7 @@
     }
     for (const w of ['A', 'B']) { const p = P[w]; if (inView(p.x - 8 * U, p.y - 12 * U, p.x + 8 * U, p.y + U)) clawd(p.x, p.y, U, { ...p.o, boilKey: w }); }
     if (tl === 'good' && s > FIVE && s < FIVE + .5) {   // the high five
-      const a = (s - FIVE) / .5, hx = MEET, hy = LY - 5.39 * U;
+      const a = (s - FIVE) / .5, hx = MEET, hy = LY - 5.1 * U;
       glow(hx, hy, 150, '#FFE0A0', 1 - a);
       boilSeed('five'); paint(starPts(hx, hy, 34 * backOut(seg(a, 0, .3)) * (1 - a * .5), .35, 6, a), { wash: C.cream, washOp: 255 * (1 - a * a), ink: PAL.ink, sw: .7 });
       for (let j = 0; j < 6; j++) { const b = j / 6 * TAU + .3; sparkle(hx + Math.cos(b) * 90 * easeOut(a), hy + Math.sin(b) * 70 * easeOut(a), 14, a); }
@@ -663,16 +663,16 @@
   // I 26.4–29.1: both press green; the tiny hourglass
   function shotI(t) {
     const sh = kick(t, GREEN, 6);
-    const c = splitCam(t, .04 * seg(t, 26.4, 29.1));
+    const c = mixCam(splitCam(t, .04 * seg(t, 26.4, 29.1)), [400, 1014, 1.38], ease(seg(t, 27.75, 28.2)));   // over to the tiny hourglass
     frame(t, [c[0] + sh[0], c[1] + sh[1], c[2]]);
   }
   // J 29.1–35.2: the gates open; the stairwell; they meet on the landing
   function shotJ(t) {
-    const wide = [1180, 1000, .62], land = [MEET, LY - 150, 1.5];
-    let c = mixCam(splitCam(t), GATES, ease(seg(t, 29.1, 29.6)));
+    const wide = [1180, 1000, .62], land = [MEET, LY - 140, 1.85];
+    let c = mixCam([400, 1014, 1.38], GATES, ease(seg(t, 29.1, 29.7)));
     if (t > 30.25) c = mixCam(GATES, wide, ease(seg(t, 30.25, 31.6)));
     if (t > 31.75) c = mixCam(wide, land, ease(seg(t, 31.75, 32.9)));
-    if (t > 32.9) c = [MEET + 8 * Math.sin((t - 32.9) * .8), LY - 150, 1.5 + .06 * (t - 32.9)];
+    if (t > 32.9) c = [MEET + 8 * Math.sin((t - 32.9) * .8), LY - 140, 1.85 + .06 * (t - 32.9)];
     frame(t, c);
     if (t > 34.9) brushWipe((t - 34.9) / .6);
   }
