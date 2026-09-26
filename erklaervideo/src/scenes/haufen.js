@@ -485,8 +485,8 @@
       const k = seg(t, 17.5, 17.8) * (1 - seg(t, 20.4, 20.5)), n = countOf(t);
       emote('?', hx - 1.2 * U, hy - 1.6 * U, U * (.85 + .09 * (10 - n)), k, t - 17.5);
     }
-    if (t > 25.25 && t < 26.8) {   // dizzy: a big question mark
-      const k = seg(t, 25.3, 25.6) * (1 - seg(t, 26.6, 26.8));
+    if (t > 25.25 && t < 26.6) {   // dizzy: a big question mark
+      const k = seg(t, 25.3, 25.6) * (1 - seg(t, 26.4, 26.58));
       emote('?', hx - 1.5 * U, hy - 3.2 * U, U * 1.35, k, t - 25.3);
     }
   }
@@ -582,7 +582,7 @@
   }
   function shotB2(t) { frame(t, [HX - 5, GY - H0 - 35, 2.55 + .15 * seg(t, 6, 7.2)]); }
   const B3 = [CX0 - 150, GY - 215, 1.42];
-  function shotB3(t) { frame(t, [B3[0] + 15 * seg(t, 7.2, 8.4), B3[1], B3[2] + .04 * seg(t, 7.2, 8.4)]); }
+  function shotB3(t) { frame(t, [B3[0] + 15 * seg(t, 7.2, 8.4), B3[1], B3[2] + .04 * seg(t, 7.2, 8.4)]); }   // continues into C's pull back
   // C 8.4–14.4: time lapse. The camera cranes down with the top of the heap.
   const TL = h => { const q = seg(950 - h, 0, 740); return camMix([HX + 400, GY - 510, .74], [HX + 190, GY - 190, 1.45], q); };
   function shotC(t) {

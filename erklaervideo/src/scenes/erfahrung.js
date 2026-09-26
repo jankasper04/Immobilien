@@ -424,7 +424,7 @@
     [0, 'sad', { emote: null }], [2.35, 'surprised', { lookY: -1 }], [3.0, 'hopeful', { lookY: -1 }], [4.45, 'determined', { lookY: -1 }],
     [5.4, 'relieved', { emote: null }], [6.4, 'starstruck'], [7.8, 'excited'], [9.75, 'love', { lookY: -1 }], [10.7, 'laugh'],
     [11.95, 'neutral', { eyes: 'wide', mouth: 'O', lookX: .9, lookY: -.3, emote: null }], [12.75, 'happy', { emote: null, eyes: 'squeeze' }], [14.65, 'confused'], [15.35, 'nervous'],
-    [17.15, 'scared'], [17.65, 'determined'], [19.05, 'surprised', { emote: 'sweat' }], [19.6, 'sad', { emote: null }],
+    [17.15, 'scared'], [17.65, 'determined'], [18.1, 'determined', { eyes: 'squeeze', emote: 'sweat' }], [19.05, 'surprised', { emote: 'sweat' }], [19.6, 'sad', { emote: null }],
     [24.65, 'surprised', { lookY: -1, emote: null }], [25.7, 'relieved', { emote: null, lookX: .8 }], [26.4, 'happy', { lookX: .7 }],
     [27.6, 'hopeful', { lookX: -1 }], [29.0, 'neutral', { eyes: 'look', seed: 1.96 }], [32.95, 'determined', { emote: null }],
   ];
@@ -452,7 +452,7 @@
       if (t > 17.65) {
         p.aL = kf(t, [[17.7, .3], [17.95, 1.45]]); p.aR = kf(t, [[17.72, .3], [17.98, 1.42]]);
         const pull = ease(seg(t, 18.1, 18.82)), a = t - 18.85;
-        if (a < 0) { p.sq = -.3 * pull + .03 * Math.sin(t * 55) * pull; p.dy = -.3 * pull; }
+        if (a < 0) { p.sq = -.42 * pull + .04 * Math.sin(t * 55) * pull; p.dy = -.2 * pull; p.rot = .05 * Math.sin(t * 23) * pull; }
         else p.sq = .25 * Math.exp(-8 * a) * Math.cos(25 * a);
         if (t > 18.2 && a < 0 && hash(Math.floor(t * 12) + 7) > .45) { p.hat = null; helm = 'head'; }
         if (a >= 0) { p.hat = null; helm = 'hands'; }
@@ -481,7 +481,7 @@
     }
     if (c.helm === 'head') { const h = bodyPt(c.x, c.y, U, c.o, 0, -RIM); return { x: h[0], y: h[1], a: c.o.rot || 0, onHead: true }; }
     if (c.helm === 'hands') {
-      const l = armTip(c.x, c.y, U, c.o, 'L'), r = armTip(c.x, c.y, U, c.o, 'R'), lift = 60 * easeOut(seg(t, 18.85, 19.0));
+      const l = armTip(c.x, c.y, U, c.o, 'L'), r = armTip(c.x, c.y, U, c.o, 'R'), lift = 170 * easeOut(seg(t, 18.85, 19.0));
       return { x: (l[0] + r[0]) / 2, y: (l[1] + r[1]) / 2 - .2 * U - lift, a: 0 };
     }
     if (c.helm === 'hand') { const h = armTip(c.x, c.y, U, c.o, 'L'); return { x: h[0] - 5.35 * U, y: h[1] + .2 * U, a: -.06 + .03 * Math.sin(t * 1.7) }; }
@@ -674,7 +674,7 @@
   // F 17.6–19.0: the decision; pulling the crown off
   function shotF(t) {
     const sh = t > 18.85 ? shakeXY(t, 14 * Math.exp(-(t - 18.85) * 9)) : [0, 0];
-    frame(t, [CX + sh[0], lerp(SY - 260, SY - 300, ease(seg(t, 17.6, 19.0))) + sh[1], lerp(1.66, 1.5, ease(seg(t, 17.6, 19.0)))]);
+    frame(t, [CX + sh[0], lerp(SY - 250, SY - 310, ease(seg(t, 17.6, 19.0))) + sh[1], lerp(2.1, 1.8, ease(seg(t, 17.6, 19.0)))]);
   }
   // G 19.0–22.6: smash cut to the rain; pull back: alone
   function shotG(t) {
@@ -691,8 +691,8 @@
     const two = [lerp(560, 548, seg(t, 28.4, 30.6)), SY - 228, lerp(1.2, 1.28, seg(t, 28.4, 30.6))];
     if (t < 28.4) c = mixCam([680, SY - 215, 1.36], [560, SY - 228, 1.2], ease(seg(t, 27.4, 28.4)));
     else if (t < 30.6) c = two;
-    else if (t < 31.6) c = mixCam([548, SY - 228, 1.28], [...EYES, 4.2], ease(seg(t, 30.6, 31.6)));
-    else c = [EYES[0], EYES[1], lerp(4.2, 5.0, ease(seg(t, 31.6, 33.4)))];
+    else if (t < 31.6) c = mixCam([548, SY - 228, 1.28], [...EYES, 5.2], ease(seg(t, 30.6, 31.6)));
+    else c = [EYES[0], EYES[1], lerp(5.2, 6.4, ease(seg(t, 31.6, 33.4)))];
     frame(t, c, { after: (cl, hp) => { if (t > 30.4) { const k = seg(t, 30.4, 31.2); glow(hp.x + 60, hp.y - 2 * U, 13 * U, GLOW, .55 * k); glow(CX + 10 * U, SY - 6 * U, 10 * U, WARM, .45 * k); } } });
   }
   // J 33.4–36: black; the helmet glows in the dark (= the first frame)
